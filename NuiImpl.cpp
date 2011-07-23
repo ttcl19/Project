@@ -69,6 +69,9 @@ void CSkeletalViewerApp::Nui_Zero()
 
 HRESULT CSkeletalViewerApp::Nui_Init()
 {
+	m_box = 4;
+	m_offset = 20;
+
     HRESULT                hr;
     RECT                rc;
 
@@ -157,10 +160,6 @@ HRESULT CSkeletalViewerApp::Nui_Init()
     // Start the Nui processing thread
     m_hEvNuiProcessStop=CreateEvent(NULL,FALSE,FALSE,NULL);
     m_hThNuiProcess=CreateThread(NULL,0,Nui_ProcessThread,this,0,NULL);
-
-	//initialize background subtraction.
-	initialdepth = (USHORT*)malloc(320*480*sizeof(USHORT));
-	FrameCount = 0;
 
     return hr;
 }
@@ -277,7 +276,7 @@ DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
         {
             case 1:
                 pthis->Nui_GotDepthAlert();
-                pthis->m_FramesTotal++;
+                //pthis->m_FramesTotal++;
                 break;
 
             case 2:
@@ -301,7 +300,7 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
 	} else {
 		return;
 	}
-	//m_FramesTotal++;
+	m_FramesTotal++;
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
 
     HRESULT hr = NuiImageStreamGetNextFrame(
@@ -320,8 +319,8 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
     {
 		
 			BYTE * pBuffer = (BYTE*) LockedRect.pBits;	
-			UINT * pBufferRun = (UINT*) pBuffer;
-			UINT * pVideoRun = m_videoCache;
+			RGBQUAD * pBufferRun = (RGBQUAD*) pBuffer;
+			RGBQUAD * pVideoRun = m_videoCache;
 
 			USHORT * pPlayerRun = m_playerMap;
 			for( int y = 0 ; y < 480 ; y++ )
@@ -370,7 +369,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             for( int x = 0 ; x < 640 ; x++ )
             {
 				*pPlayerRun = 0;
-				*pPlayerRun++;
+				pPlayerRun++;
 			}
 		}
 		
@@ -384,38 +383,19 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             for( int x = 0 ; x < 320 ; x++ )
             {
 				depth = *pBufferRun & 0xfff8;
-
-				if (FrameCount == 0)
-				{
-					initialdepth[x + y*320] = depth;
-				}
-				//TODO if first frame, save depth values as background
-
 				player = *pBufferRun & 7;
 
-				
-				NuiImageGetColorPixelCoordinatesFromDepthPixel(
-					NUI_IMAGE_RESOLUTION_640x480,
-					0, x, y, depth, &colorX, &colorY);
-
-				USHORT writeover = 0;
-
-				//HACK player id based:
-				writeover = player;
-				//HACK background subtraction
-				if (depth < initialdepth[x + y*320] - 10)
+				if (player != 0) 
 				{
-					//HACK writeover = 10;
+					NuiImageGetColorPixelCoordinatesFromDepthPixel(
+						NUI_IMAGE_RESOLUTION_640x480,
+						0, x, y, depth, &colorX, &colorY);
+
+						m_playerMap[colorY * 640 + colorX] = player;
+						m_playerMap[colorY * 640 + colorX + 1] = player;
+						m_playerMap[(colorY + 1)* 640 + colorX] = player;
+						m_playerMap[(colorY + 1)* 640 + colorX + 1] = player;
 				}
-
-				m_playerMap[colorY * 640 + colorX] = writeover;
-				m_playerMap[colorY * 640 + colorX + 1] = writeover;
-				m_playerMap[(colorY + 1)* 640 + colorX] = writeover;
-				m_playerMap[(colorY + 1)* 640 + colorX + 1] = writeover;
-
-						
-
-				
 
                 RGBQUAD quad = Nui_ShortToQuad_Depth( *pBufferRun );
                 pBufferRun++;
@@ -424,38 +404,44 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             }
         }
 
-		UINT bgColor = 0x00ffeedd;
-		UINT * pVideoRun = m_videoCache;
+		RGBQUAD color = {0xee, 0xcc, 0xee, 0x00};
+
+		int size = (480 - m_offset * 2);
+		int gap = 640 - size;
+		size /= m_box;
+		int startX, startY;
+		int borderWidth = 1;
+		
 		pPlayerRun = m_playerMap;
-		for( int y = 0 ; y < 480 ; y++ )
-        {
-            for( int x = 0 ; x < 640; x++ )
-            {	
-				if (*pPlayerRun == 0) 
-				{
-					*pVideoRun = bgColor;
-				}
-					pVideoRun++;
+		for (int i = 0; i < m_box * m_box; i++) {
+			startX = (i / m_box) * size + gap / 2;			
+			startY = (i % m_box) * size + m_offset;
+			pPlayerRun = m_playerMap + startY * 640 + startX;
+
+			for (int j = 0; j < size; j++) {
+				for (int k = 0; k < size; k++) {
+					// write the score counter here
 					pPlayerRun++;
-            }
-        }
+				}
+				
+				pPlayerRun += size * (m_box - 1) + gap;
+			}
+		}
 
 		m_DrawVideo.DrawFrame( (BYTE*) m_videoCache );
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
-		ULONGLONG diff = (ULONGLONG) ((1.0 / m_FramesTotal - 1.0 / 20) * 1000);
-		//diff = 0;
+		ULONGLONG diff = (ULONGLONG) ((1.0 / m_FramesTotal - 1.0 / 30) * 1000);
+		diff = 0;
 		m_videoDelay = GetTickCount64() + diff;
     }
     else
     {
         OutputDebugString( L"Buffer length of received texture is bogus\r\n" );
     }
-	FrameCount++;
+
     NuiImageStreamReleaseFrame( m_pDepthStreamHandle, pImageFrame );
 }
-
-
 
 void CSkeletalViewerApp::Nui_BlankSkeletonScreen(HWND hWnd)
 {
@@ -548,8 +534,59 @@ void CSkeletalViewerApp::Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSke
 
 }
 
+void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color) {
+	int size = (480 - m_offset * 2);
+	int gap = 640 - size;
+	size /= m_box;
+	int startX, startY;
+	int borderWidth = 1;
+	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
+	
+	startX = (boxIndex / m_box) * size + gap / 2;			
+	startY = (boxIndex % m_box) * size + m_offset;
+	RGBQUAD * pixel = m_videoCache + startY * 640 + startX;
+	// top border
+	for (int j = 0; j < borderWidth; j++) {
+		for (int k = 0; k < size; k++) {
+			*pixel = borderColor;
+			pixel++;
+		}
+		pixel += size * (m_box - 1) + gap;
+	}
 
+	for (int j = 0; j < size - borderWidth * 2; j++) {
+		// left border
+		for (int k = 0; k < borderWidth; k++) {
+			*pixel = borderColor;
+			pixel++;
+		}
 
+		for (int k = 0; k < size - borderWidth * 2; k++) {
+			pixel->rgbBlue = (color->rgbBlue - pixel->rgbBlue) / 2 + pixel->rgbBlue;
+			pixel->rgbGreen = (color->rgbGreen - pixel->rgbGreen) / 2 + pixel->rgbGreen;
+			pixel->rgbRed = (color->rgbRed - pixel->rgbRed) / 2 + pixel->rgbRed;
+
+			pixel++;
+		}
+				 
+		// right border
+		for (int k = 0; k < borderWidth; k++) {
+			*pixel = borderColor;
+			pixel++;
+		}
+				
+		pixel += size * (m_box - 1) + gap;
+	}
+
+	// bottom border
+	for (int j = 0; j < borderWidth; j++) {
+		for (int k = 0; k < size; k++) {
+			*pixel = borderColor;
+			pixel++;
+		}
+		pixel += size * (4 - 1) + gap;
+	}
+}
 
 void CSkeletalViewerApp::Nui_DoDoubleBuffer(HWND hWnd,HDC hDC)
 {

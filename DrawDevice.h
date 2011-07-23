@@ -9,7 +9,7 @@
 * License Agreement: http://research.microsoft.com/KinectSDK-ToU        *
 *                                                                       *
 ************************************************************************/
-
+//hi.
 #pragma once
 
 #include <d3d9.h>

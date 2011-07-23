@@ -14,7 +14,7 @@
 
 #include "resource.h"
 #include "MSR_NuiApi.h"
-#include "Device.h"
+#include "DrawDevice.h"
 
 #define SZ_APPDLG_WINDOW_CLASS        _T("SkeletalViewerAppDlgWndClass")
 

@@ -138,4 +138,3 @@ nRet=::MessageBox(hwnd,szRes,g_szAppTitle,nType);
 return (nRet);
 }
 
-

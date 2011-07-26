@@ -32,7 +32,8 @@ public:
     void                    Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSkel, HWND hWnd, int WhichSkeletonColor );
     void                    Nui_DrawSkeletonSegment( NUI_SKELETON_DATA * pSkel, int numJoints, ... );
 
-    void					drawBox(int boxIndex, RGBQUAD * color, double opacity);
+    void					drawBox(int boxIndex, RGBQUAD * color);
+    void					drawBox(int boxIndex, RGBQUAD * color,double opacity);
 	RGBQUAD                 Nui_ShortToQuad_Depth( USHORT s );
 
     static LONG CALLBACK    WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

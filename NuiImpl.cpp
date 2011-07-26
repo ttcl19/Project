@@ -294,7 +294,7 @@ DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
 
 void CSkeletalViewerApp::Nui_GotVideoAlert( )
 {
-	
+
 	if (GetTickCount64() > m_videoDelay && m_videoDelay != 0) {
 		m_videoDelay = 0;
 	} else {
@@ -317,7 +317,7 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
     pTexture->LockRect( 0, &LockedRect, NULL, 0 );
     if( LockedRect.Pitch != 0 )
     {
-		
+
 			BYTE * pBuffer = (BYTE*) LockedRect.pBits;	
 			RGBQUAD * pBufferRun = (RGBQUAD*) pBuffer;
 			RGBQUAD * pVideoRun = m_videoCache;
@@ -337,7 +337,7 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
     {
         OutputDebugString( L"Buffer length of received texture is bogus\r\n" );
     }
-	
+
     NuiImageStreamReleaseFrame( m_pVideoStreamHandle, pImageFrame );
 }
 
@@ -372,12 +372,14 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 				pPlayerRun++;
 			}
 		}
-		
+
         // draw the bits to the bitmap
         RGBQUAD * rgbrun = m_rgbWk;
         USHORT * pBufferRun = (USHORT*) pBuffer;
 		USHORT player, depth;
 		long colorX = 0, colorY = 0;
+		long bigPixel[4];
+		long MAX = 640 * 480;
         for( int y = 0 ; y < 240 ; y++ )
         {
             for( int x = 0 ; x < 320 ; x++ )
@@ -391,10 +393,17 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 						NUI_IMAGE_RESOLUTION_640x480,
 						0, x, y, depth, &colorX, &colorY);
 
-						m_playerMap[colorY * 640 + colorX] = player;
-						m_playerMap[colorY * 640 + colorX + 1] = player;
-						m_playerMap[(colorY + 1)* 640 + colorX] = player;
-						m_playerMap[(colorY + 1)* 640 + colorX + 1] = player;
+						bigPixel[0] = colorY * 640 + colorX;
+						bigPixel[1] = bigPixel[0] + 1;
+						bigPixel[2] = bigPixel[0] + 640;
+						bigPixel[3] = bigPixel[2] + 1;
+
+						for (int i = 0; i < 4; i++) {
+							if (bigPixel[i] > MAX) {
+								break;
+							}
+							m_playerMap[bigPixel[i]] = player;
+						}
 				}
 
                 RGBQUAD quad = Nui_ShortToQuad_Depth( *pBufferRun );
@@ -404,30 +413,57 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             }
         }
 
-		RGBQUAD color = {0xee, 0xcc, 0xee, 0x00};
-
 		int size = (480 - m_offset * 2);
 		int gap = 640 - size;
 		size /= m_box;
 		int startX, startY;
 		int borderWidth = 1;
-		
-		pPlayerRun = m_playerMap;
+		int score;
+
+		bool shape[16];
+		bool shapeTemplate[16] = {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0};
+
 		for (int i = 0; i < m_box * m_box; i++) {
-			startX = (i / m_box) * size + gap / 2;			
-			startY = (i % m_box) * size + m_offset;
+			startX = (i % m_box) * size + gap / 2;			
+			startY = (i / m_box) * size + m_offset;
 			pPlayerRun = m_playerMap + startY * 640 + startX;
 
+			score = 0;
 			for (int j = 0; j < size; j++) {
 				for (int k = 0; k < size; k++) {
-					// write the score counter here
+					if (*pPlayerRun != 0) {
+						score++;
+					}
 					pPlayerRun++;
+					shape[i] = (score > 0.4 * size * size);
 				}
-				
+
 				pPlayerRun += size * (m_box - 1) + gap;
 			}
 		}
 
+
+		RGBQUAD matched		= {0x00, 0x00, 0xff, 0x00};
+		RGBQUAD unmatched	= {0xff, 0x00, 0x00, 0x00};
+		RGBQUAD ignored		= {0xfa, 0xfa, 0xff, 0x00};
+		RGBQUAD outOfBounds = {0x00, 0xff, 0x00, 0x00};
+
+
+		for (int i = 0; i < m_box * m_box; i++) {
+			if (shapeTemplate[i]) {
+				if (shape[i]) {
+					drawBox(i, &matched, 0.75);
+				} else {
+					drawBox(i, &unmatched, 0.5);
+				}
+			} else {
+				if (shape[i]) {
+					drawBox(i, &outOfBounds, 0.5);
+				} else {
+					drawBox(i, &ignored, 0.25);
+				}
+			}
+		}
 		m_DrawVideo.DrawFrame( (BYTE*) m_videoCache );
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
@@ -534,16 +570,16 @@ void CSkeletalViewerApp::Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSke
 
 }
 
-void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color) {
+void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) {
 	int size = (480 - m_offset * 2);
 	int gap = 640 - size;
 	size /= m_box;
 	int startX, startY;
 	int borderWidth = 1;
 	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
-	
-	startX = (boxIndex / m_box) * size + gap / 2;			
-	startY = (boxIndex % m_box) * size + m_offset;
+
+	startX = (boxIndex % m_box) * size + gap / 2;			
+	startY = (boxIndex / m_box) * size + m_offset;
 	RGBQUAD * pixel = m_videoCache + startY * 640 + startX;
 	// top border
 	for (int j = 0; j < borderWidth; j++) {
@@ -562,19 +598,19 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color) {
 		}
 
 		for (int k = 0; k < size - borderWidth * 2; k++) {
-			pixel->rgbBlue = (color->rgbBlue - pixel->rgbBlue) / 2 + pixel->rgbBlue;
-			pixel->rgbGreen = (color->rgbGreen - pixel->rgbGreen) / 2 + pixel->rgbGreen;
-			pixel->rgbRed = (color->rgbRed - pixel->rgbRed) / 2 + pixel->rgbRed;
+			pixel->rgbBlue = color->rgbBlue * opacity + pixel->rgbBlue * (1 - opacity);
+			pixel->rgbGreen = color->rgbGreen * opacity + pixel->rgbGreen * (1 - opacity);
+			pixel->rgbRed = color->rgbRed * opacity + pixel->rgbRed * (1 - opacity);
 
 			pixel++;
 		}
-				 
+
 		// right border
 		for (int k = 0; k < borderWidth; k++) {
 			*pixel = borderColor;
 			pixel++;
 		}
-				
+
 		pixel += size * (m_box - 1) + gap;
 	}
 

@@ -137,4 +137,3 @@ LoadString(g_hInst,nID,szRes,sizeof(szRes)/sizeof(szRes[0]));
 nRet=::MessageBox(hwnd,szRes,g_szAppTitle,nType);
 return (nRet);
 }
-

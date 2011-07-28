@@ -40,6 +40,11 @@ public:
 
     HWND m_hWnd;
 
+	void					KeyboardInput(WPARAM keyCode);
+	void					CapturePicture();
+
+    HFONT					m_hFontFPS;
+
 private:
     static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);
 
@@ -57,7 +62,6 @@ private:
     HANDLE        m_hNextSkeletonEvent;
     HANDLE        m_pDepthStreamHandle;
     HANDLE        m_pVideoStreamHandle;
-    HFONT         m_hFontFPS;
     HPEN          m_Pen[6];
     HDC           m_SkeletonDC;
     HBITMAP       m_SkeletonBMP;
@@ -66,7 +70,9 @@ private:
     POINT         m_Points[NUI_SKELETON_POSITION_COUNT];
     RGBQUAD       m_rgbWk[640*480];
 	ULONGLONG	  m_videoDelay;
-	RGBQUAD		  m_videoCache[640*480];
+	RGBQUAD		  m_videoCache[640*480]; //raw video input
+	RGBQUAD		  m_videoEffects[640*480]; //for drawing special effects on top.
+
 	USHORT		  m_playerMap[640*480];
 	UINT		  m_box;
 	UINT		  m_offset;
@@ -75,6 +81,10 @@ private:
     int           m_FramesTotal;
     int           m_LastFPStime;
     int           m_LastFramesTotal;
+
+	//captured pictures
+	RGBQUAD  	  m_CapturedPictures[100][640*480];
+	int			  m_NumCapturedPictures;
 };
 
 int MessageBoxResource(HWND hwnd,UINT nID,UINT nType);

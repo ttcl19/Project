@@ -28,58 +28,50 @@ HINSTANCE			g_hInst;				// current instance
 HWND				g_hWndApp;				// Windows Handle to main application
 TCHAR				g_szAppTitle[256];		// Application title
 
-
-
-
-int APIENTRY _tWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow)
+void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 {
-	MSG			msg;
-	WNDCLASS	wc;
+	//Codes here:
+	//http://msdn.microsoft.com/en-us/library/dd375731(v=vs.85).aspx
 
-	// Store the instance handle
-	g_hInst=hInstance;
-
-	LoadString(g_hInst,IDS_APPTITLE,g_szAppTitle,sizeof(g_szAppTitle)/sizeof(g_szAppTitle[0]));
-
-	// Dialog custom window class
-	ZeroMemory(&wc,sizeof(wc));
-	wc.style=CS_HREDRAW | CS_VREDRAW;
-	wc.cbWndExtra=DLGWINDOWEXTRA;
-	wc.hInstance=hInstance;
-	wc.hCursor=LoadCursor(NULL,IDC_ARROW);
-	wc.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_SKELETALVIEWER));
-	wc.lpfnWndProc=DefDlgProc;
-	wc.lpszClassName=SZ_APPDLG_WINDOW_CLASS;
-	if(!RegisterClass(&wc))
-		return (0);
-
-	// Create main application window
-	g_hWndApp=CreateDialogParam(g_hInst,MAKEINTRESOURCE(IDD_APP),NULL,(DLGPROC) CSkeletalViewerApp::WndProc,NULL);
-
-	// Show window
-	ShowWindow(g_hWndApp,nCmdShow);
-	UpdateWindow(g_hWndApp);
-
-	// Main message loop:
-	while(GetMessage(&msg,NULL,0,0)) 
+	switch(keyCode)
 	{
-		// If a dialog message
-		if(g_hWndApp!=NULL && IsDialogMessage(g_hWndApp,&msg))
-			continue;
+		case 0x31 : //key 1
 
-		// otherwise do default window processing
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-    }
-	return (msg.wParam);
+			break;
+		case 0x43 : //key C
+			CapturePicture();
+			
+
+			break;
+	}
+
 }
 
 
-
-LONG CALLBACK CSkeletalViewerApp::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+/*****************************************************************************/
+/* int MessageBoxResourceV(HWND hwnd,UINT nID,UINT nType, ... )
+/*
+/* Superset of MessageBox functionality allowing a user to specify a String
+/* table loaded string 
+/*****************************************************************************/
+int MessageBoxResource(HWND hwnd,UINT nID,UINT nType)
 {
+static TCHAR szRes[512];
+int         nRet;
+
+LoadString(g_hInst,nID,szRes,sizeof(szRes)/sizeof(szRes[0]));
+nRet=::MessageBox(hwnd,szRes,g_szAppTitle,nType);
+return (nRet);
+}
+
+/*LONG*/ LRESULT  CALLBACK CSkeletalViewerApp::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+
 	switch(message)
 	{
+	    case WM_CREATE:
+
+			break;
 		case WM_INITDIALOG:
 			{
 			LOGFONT lf;
@@ -120,20 +112,89 @@ LONG CALLBACK CSkeletalViewerApp::WndProc(HWND hWnd, UINT message, WPARAM wParam
 	return (FALSE);
 }
 
-
-
-/*****************************************************************************/
-/* int MessageBoxResourceV(HWND hwnd,UINT nID,UINT nType, ... )
-/*
-/* Superset of MessageBox functionality allowing a user to specify a String
-/* table loaded string 
-/*****************************************************************************/
-int MessageBoxResource(HWND hwnd,UINT nID,UINT nType)
+int APIENTRY _tWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow)
 {
-static TCHAR szRes[512];
-int         nRet;
+	LoadString(g_hInst,IDS_APPTITLE,g_szAppTitle,sizeof(g_szAppTitle)/sizeof(g_szAppTitle[0]));
 
-LoadString(g_hInst,nID,szRes,sizeof(szRes)/sizeof(szRes[0]));
-nRet=::MessageBox(hwnd,szRes,g_szAppTitle,nType);
-return (nRet);
+	// Dialog custom window class
+	WNDCLASSEX 	wc;
+
+	ZeroMemory(&wc,sizeof(wc));
+	wc.cbSize = sizeof(WNDCLASSEX);
+	//wc.lpfnWndProc    = WndProc;             //wnd Procedure pointer
+	wc.cbWndExtra     = DLGWINDOWEXTRA;
+	wc.hInstance      = hInstance; 
+	wc.hCursor=LoadCursor(NULL,IDC_ARROW);
+	wc.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_SKELETALVIEWER));
+	wc.lpfnWndProc=DefDlgProc;
+	wc.lpszClassName=SZ_APPDLG_WINDOW_CLASS;
+	if(!RegisterClassEx(&wc))
+		return (0);
+
+	// Store the instance handle
+	g_hInst=hInstance;
+
+	// Create main application window
+	//g_hWndApp=CreateDialog(g_hInst,(LPCTSTR)IDD_APP,0,0);
+	g_hWndApp=CreateDialogParam(g_hInst,MAKEINTRESOURCE(IDD_APP),NULL,(DLGPROC) CSkeletalViewerApp::WndProc,NULL);
+
+	/*g_hWndApp=CreateWindow(
+		SZ_APPDLG_WINDOW_CLASS,
+		g_szAppTitle,
+		DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME,
+		CW_USEDEFAULT, 
+		CW_USEDEFAULT,
+		1024,700, 
+		NULL,
+		NULL,
+		hInstance,
+		NULL);*/
+
+	if (!g_hWndApp)
+    {
+        MessageBox(NULL,
+            _T("Call to CreateWindow failed!"),
+            _T("Win32 Guided Tour"),
+            NULL);
+
+        return 1;
+    }
+
+	// Show window
+	ShowWindow(g_hWndApp,nCmdShow);
+	UpdateWindow(g_hWndApp);
+
+	SetFocus(g_hWndApp);
+
+	// Main message loop:
+	MSG			msg;
+	int		lastmsg  = 0;
+	while(GetMessage(&msg,NULL,0,0)) 
+	{
+		// If a dialog message
+		/*if(g_hWndApp!=NULL && IsDialogMessage(g_hWndApp,&msg))
+			continue;*/
+
+		switch (msg.message)
+		{
+			case WM_KEYDOWN:
+				lastmsg = msg.message;
+
+				g_CSkeletalViewerApp.KeyboardInput(msg.wParam);
+
+				break;
+		}
+
+		// otherwise do default window processing
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
+    }
+	return (msg.wParam);
 }
+
+
+
+
+
+

@@ -72,6 +72,8 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	m_box = 4;
 	m_offset = 20;
 
+	m_NumCapturedPictures = 0;
+
     HRESULT                hr;
     RECT                rc;
 
@@ -327,6 +329,7 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
 			{
 				for( int x = 0 ; x < 640 ; x++ )
 				{
+					//copy kinect video buffer into local.
 					*pVideoRun = *pBufferRun;
 					pVideoRun++;
 					pBufferRun++;
@@ -413,13 +416,18 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             }
         }
 
+		//copy raw video to var for drawing effects (like tetris boxes) on top.
+		memcpy(m_videoEffects,m_videoCache,640*480*4);
+
+
+		//tetris box drawing.
 		int size = (480 - m_offset * 2);
 		int gap = 640 - size;
 		size /= m_box;
 		int startX, startY;
 		int borderWidth = 1;
 		int score;
-
+		
 		bool shape[16];
 		bool shapeTemplate[16] = {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0};
 
@@ -448,7 +456,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 		RGBQUAD ignored		= {0xfa, 0xfa, 0xff, 0x00};
 		RGBQUAD outOfBounds = {0x00, 0xff, 0x00, 0x00};
 
-
 		for (int i = 0; i < m_box * m_box; i++) {
 			if (shapeTemplate[i]) {
 				if (shape[i]) {
@@ -464,7 +471,38 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 				}
 			}
 		}
-		m_DrawVideo.DrawFrame( (BYTE*) m_videoCache );
+		m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
+
+		//picture-in-picture
+		double PIPscale = 0.3;
+		RECT PIPRect;
+		//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
+		int width = 548;//640;
+		int height = 455;//480;
+		//put in top right.
+		PIPRect.left = (long)(width - width*PIPscale);
+		PIPRect.top = 0;//(long)(height - height*PIPscale);
+		PIPRect.right = (long)(width);
+		PIPRect.bottom = PIPscale*height;//(long)(height);
+
+		m_DrawVideo.DrawRect( (BYTE*) m_videoCache, &PIPRect);
+
+		//draw RGB Captured
+		double CapturedScale = 0.2;
+		for (int c = 0; c < m_NumCapturedPictures; c++)
+		{
+			RECT CapturedRect;
+			CapturedRect.left = c*CapturedScale*width;
+			CapturedRect.right = (c+1)*CapturedScale*width;
+			CapturedRect.top = (long)(height - height*CapturedScale);
+			CapturedRect.bottom = height;
+
+			m_DrawVideo.DrawRect( (BYTE*) m_CapturedPictures[c], &CapturedRect);
+		}
+
+		m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
+
+
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
 		ULONGLONG diff = (ULONGLONG) ((1.0 / m_FramesTotal - 1.0 / 30) * 1000);
@@ -580,7 +618,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 
 	startX = (boxIndex % m_box) * size + gap / 2;			
 	startY = (boxIndex / m_box) * size + m_offset;
-	RGBQUAD * pixel = m_videoCache + startY * 640 + startX;
+	RGBQUAD * pixel = m_videoEffects + startY * 640 + startX;
 	// top border
 	for (int j = 0; j < borderWidth; j++) {
 		for (int k = 0; k < size; k++) {

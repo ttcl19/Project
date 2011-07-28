@@ -172,6 +172,20 @@ done:
 
 HRESULT DrawDevice::DrawFrame( BYTE * pBits )
 {
+	//assumes this is the one and only call.
+
+	HRESULT hr = DrawRect(pBits, &m_rcDest);
+	hr = FinishedDrawThisFrame();
+	return hr;
+}
+
+HRESULT DrawDevice::DrawFullRect( BYTE * pBits )
+{
+	return DrawRect(pBits, &m_rcDest);
+}
+
+HRESULT DrawDevice::DrawRect( BYTE * pBits, RECT * destRect )
+{
     HRESULT hr = S_OK;
     BYTE *pbScanline0 = NULL;
     LONG lStride = 0;
@@ -215,22 +229,14 @@ HRESULT DrawDevice::DrawFrame( BYTE * pBits )
 
     if (FAILED(hr)) { goto done; }
 
-    hr = m_pDevice->ColorFill(pBB, NULL, D3DCOLOR_XRGB(0, 0, 0x80));
+    //HACK no colour fill hr = m_pDevice->ColorFill(pBB, NULL, D3DCOLOR_XRGB(0, 0, 0x80));
 
-    if (FAILED(hr)) { goto done; }
+	if (FAILED(hr)) { goto done; }
 
-
-    // Blit the frame.
-
-    hr = m_pDevice->StretchRect(pSurf, NULL, pBB, &m_rcDest, D3DTEXF_LINEAR);
+	//This is where the draw ACTUALLY happens.
+    hr = m_pDevice->StretchRect(pSurf, NULL, pBB, destRect, D3DTEXF_LINEAR);
     
     if (FAILED(hr)) { goto done; }
-
-
-    // Present the frame.
-    
-    hr = m_pDevice->Present(NULL, NULL, NULL, NULL);
-    
 
 done:
 
@@ -243,6 +249,17 @@ done:
 	return hr;
 }
 
+HRESULT DrawDevice::FinishedDrawThisFrame()
+{
+	//should only be called once "per frame"
+
+	HRESULT hr;
+
+    // Present the frame.
+    hr = m_pDevice->Present(NULL, NULL, NULL, NULL);
+
+	return hr;
+}
 
 //-------------------------------------------------------------------
 // DestroyDevice 

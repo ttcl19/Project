@@ -11,6 +11,6 @@ void CSkeletalViewerApp::CapturePicture()
 
 	m_NumCapturedPictures++;
 
-	//TODO somehow transmit captured pictures, please.
+	//TODO somehow transmit captured pictures, please..
 }
 

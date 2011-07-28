@@ -11,6 +11,6 @@ void CSkeletalViewerApp::CapturePicture()
 
 	m_NumCapturedPictures++;
 
-	//TODO save these in files so they can be used later in case of a crash.
+	//TODO somehow transmit captured pictures, please.
 }
 

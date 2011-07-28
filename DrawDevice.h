@@ -38,9 +38,9 @@ public:
     HRESULT SetVideoType( int Width, int Height, int Stride );
     HRESULT DrawFrame( BYTE * pBits );
 
+	//Below Draw functions by Dustin
 	HRESULT DrawFullRect( BYTE * pBits );
     HRESULT DrawRect( BYTE * pBits, RECT * destRect );
-
 	HRESULT FinishedDrawThisFrame();
 
     HRESULT CreateDevice(HWND hwnd);

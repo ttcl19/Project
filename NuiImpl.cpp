@@ -69,8 +69,14 @@ void CSkeletalViewerApp::Nui_Zero()
 
 HRESULT CSkeletalViewerApp::Nui_Init()
 {
-	m_box = 4;
-	m_offset = 20;
+	m_numHBox = 6;
+	m_numVBox = 4;
+	m_boxHeight = 100;
+	m_boxWidth = 100;
+	m_offset = 80;
+
+	m_p1Index = 0;
+	m_p2Index = 0;
 
 	m_NumCapturedPictures = 0;
 
@@ -362,6 +368,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
     NuiImageBuffer * pTexture = pImageFrame->pFrameTexture;
     KINECT_LOCKED_RECT LockedRect;
     pTexture->LockRect( 0, &LockedRect, NULL, 0 );
+
     if( LockedRect.Pitch != 0 )
     {
         BYTE * pBuffer = (BYTE*) LockedRect.pBits;
@@ -380,6 +387,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
         RGBQUAD * rgbrun = m_rgbWk;
         USHORT * pBufferRun = (USHORT*) pBuffer;
 		USHORT player, depth;
+		UINT curP1Index = 0, curP2Index = 0; 
 		long colorX = 0, colorY = 0;
 		long bigPixel[4];
 		long MAX = 640 * 480;
@@ -392,6 +400,12 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 				if (player != 0) 
 				{
+					if (curP1Index == 0) {
+						curP1Index = player;
+					} else if (curP2Index == 0) {
+						curP2Index = player;
+					}
+
 					NuiImageGetColorPixelCoordinatesFromDepthPixel(
 						NUI_IMAGE_RESOLUTION_640x480,
 						0, x, y, depth, &colorX, &colorY);
@@ -416,61 +430,103 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             }
         }
 
+		// if P1 is not assigned and has dissappeared
+		if (m_p1Index == 0 || 
+		   (m_p1Index != curP1Index && m_p1Index != curP2Index)) {
+			if (curP1Index != 0 && curP1Index != m_p2Index) {
+				m_p1Index = curP1Index;
+				curP1Index = 0;
+			} else if (curP2Index != 0 && curP2Index != m_p2Index) {
+				m_p1Index = curP2Index;
+				curP2Index = 0;
+			}
+		}
+		
+		if (m_p2Index == 0 || 
+		   (m_p2Index != curP1Index && m_p2Index != curP2Index)) {
+			if (curP1Index != 0 && curP1Index != m_p1Index) {
+				m_p2Index = curP1Index;
+				curP1Index = 0;
+			} else if (curP2Index != 0 && curP2Index != m_p1Index) {
+				m_p2Index = curP2Index;
+				curP2Index = 0;
+			}
+		}
 		//copy raw video to var for drawing effects (like tetris boxes) on top.
 		memcpy(m_videoEffects,m_videoCache,640*480*4);
 
-
-		//tetris box drawing.
-		int size = (480 - m_offset * 2);
-		int gap = 640 - size;
-		size /= m_box;
-		int startX, startY;
-		int borderWidth = 1;
-		int score;
+		//tetris box drawing
+		UINT shapeTemplate[24] = {
+			0, 0, 0, 0, 0, 0,
+			0, 0, 1, 0, 2, 2, 
+			0, 1, 1, 0, 2, 0, 
+			0, 0, 1, 0, 2, 0
+		};
 		
-		bool shape[16];
-		bool shapeTemplate[16] = {0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0};
+		
+		RGBQUAD p1Matched		= {0x2f, 0xff, 0xad, 0x00};
+		RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
+		RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
+		RGBQUAD p2Matched		= {0x82, 0xdd, 0xee, 0x00};
+		RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
+		RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
+		RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
+		bool p1Passed = true, p2Passed = true;
 
-		for (int i = 0; i < m_box * m_box; i++) {
-			startX = (i % m_box) * size + gap / 2;			
-			startY = (i / m_box) * size + m_offset;
+		int gap = 640 - m_boxWidth * m_numHBox;
+		int startX, startY;
+		UINT p1Score, p2Score;
+		UINT limit = 0.3 * m_boxHeight * m_boxWidth;
+
+		for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
+			startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
+			startY = (i / m_numHBox) * m_boxHeight + m_offset;
 			pPlayerRun = m_playerMap + startY * 640 + startX;
 
-			score = 0;
-			for (int j = 0; j < size; j++) {
-				for (int k = 0; k < size; k++) {
-					if (*pPlayerRun != 0) {
-						score++;
+			p1Score = 0;
+			p2Score = 0;
+			for (UINT j = 0; j < m_boxHeight; j++) {
+				for (UINT k = 0; k < m_boxWidth; k++) {
+					if (*pPlayerRun == m_p1Index) {
+						p1Score++;
+					}
+
+					if (*pPlayerRun == m_p2Index) {
+						p2Score++;
 					}
 					pPlayerRun++;
-					shape[i] = (score > 0.4 * size * size);
 				}
 
-				pPlayerRun += size * (m_box - 1) + gap;
+				pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
 			}
-		}
 
-
-		RGBQUAD matched		= {0x00, 0x00, 0xff, 0x00};
-		RGBQUAD unmatched	= {0xff, 0x00, 0x00, 0x00};
-		RGBQUAD ignored		= {0xfa, 0xfa, 0xff, 0x00};
-		RGBQUAD outOfBounds = {0x00, 0xff, 0x00, 0x00};
-
-		for (int i = 0; i < m_box * m_box; i++) {
-			if (shapeTemplate[i]) {
-				if (shape[i]) {
-					drawBox(i, &matched, 0.75);
-				} else {
-					drawBox(i, &unmatched, 0.5);
-				}
-			} else {
-				if (shape[i]) {
-					drawBox(i, &outOfBounds, 0.5);
+			if (shapeTemplate[i] == 0) {
+				if (p1Score >= limit) {
+					p1Passed = false;
+					drawBox(i, &p1Out, 0.5);
+				} else if (p2Score >= limit) {
+					p2Passed = false;
+					drawBox(i, &p2Out, 0.5);
 				} else {
 					drawBox(i, &ignored, 0.25);
 				}
+			} else if (shapeTemplate[i] == 1) {
+				if (p1Score < limit) {
+					p1Passed = false;
+					drawBox(i, &p1Unmatched, 0.5);
+				} else {
+					drawBox(i, &p1Matched, 0.25);
+				}
+			} else if (shapeTemplate[i] == 2) {
+				if (p2Score < limit) {
+					p2Passed = false;
+					drawBox(i, &p2Unmatched, 0.5);
+				} else {
+					drawBox(i, &p2Matched, 0.25);
+				}
 			}
 		}
+
 		m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
 		//picture-in-picture
@@ -479,13 +535,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 		//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
 		int width = 548;//640;
 		int height = 455;//480;
-		//put in top right.
-		PIPRect.left = (long)(width - width*PIPscale);
-		PIPRect.top = 0;//(long)(height - height*PIPscale);
-		PIPRect.right = (long)(width);
-		PIPRect.bottom = PIPscale*height;//(long)(height);
-
-		m_DrawVideo.DrawRect( (BYTE*) m_videoCache, &PIPRect);
 
 		//draw RGB Captured
 		double CapturedScale = 0.2;
@@ -609,56 +658,54 @@ void CSkeletalViewerApp::Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSke
 }
 
 void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) {
-	int size = (480 - m_offset * 2);
-	int gap = 640 - size;
-	size /= m_box;
+	int gap = 640 - m_boxWidth * m_numHBox;
 	int startX, startY;
-	int borderWidth = 1;
+	UINT borderWidth = 1;
 	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
 
-	startX = (boxIndex % m_box) * size + gap / 2;			
-	startY = (boxIndex / m_box) * size + m_offset;
+	startX = (boxIndex % m_numHBox) * m_boxWidth + gap / 2;			
+	startY = (boxIndex / m_numHBox) * m_boxHeight + m_offset;
 	RGBQUAD * pixel = m_videoEffects + startY * 640 + startX;
 	// top border
-	for (int j = 0; j < borderWidth; j++) {
-		for (int k = 0; k < size; k++) {
+	for (UINT j = 0; j < borderWidth; j++) {
+		for (UINT k = 0; k < m_boxWidth; k++) {
 			*pixel = borderColor;
 			pixel++;
 		}
-		pixel += size * (m_box - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + gap;
 	}
 
-	for (int j = 0; j < size - borderWidth * 2; j++) {
+	for (UINT j = 0; j < m_boxHeight - borderWidth * 2; j++) {
 		// left border
-		for (int k = 0; k < borderWidth; k++) {
+		for (UINT k = 0; k < borderWidth; k++) {
 			*pixel = borderColor;
 			pixel++;
 		}
 
-		for (int k = 0; k < size - borderWidth * 2; k++) {
-			pixel->rgbBlue = color->rgbBlue * opacity + pixel->rgbBlue * (1 - opacity);
-			pixel->rgbGreen = color->rgbGreen * opacity + pixel->rgbGreen * (1 - opacity);
-			pixel->rgbRed = color->rgbRed * opacity + pixel->rgbRed * (1 - opacity);
+		for (UINT k = 0; k < m_boxWidth - borderWidth * 2; k++) {
+			pixel->rgbBlue = (BYTE) color->rgbBlue * opacity + pixel->rgbBlue * (1 - opacity);
+			pixel->rgbGreen = (BYTE) color->rgbGreen * opacity + pixel->rgbGreen * (1 - opacity);
+			pixel->rgbRed = (BYTE) color->rgbRed * opacity + pixel->rgbRed * (1 - opacity);
 
 			pixel++;
 		}
 
 		// right border
-		for (int k = 0; k < borderWidth; k++) {
+		for (UINT k = 0; k < borderWidth; k++) {
 			*pixel = borderColor;
 			pixel++;
 		}
 
-		pixel += size * (m_box - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + gap;
 	}
 
 	// bottom border
-	for (int j = 0; j < borderWidth; j++) {
-		for (int k = 0; k < size; k++) {
+	for (UINT j = 0; j < borderWidth; j++) {
+		for (UINT k = 0; k < m_boxWidth; k++) {
 			*pixel = borderColor;
 			pixel++;
 		}
-		pixel += size * (4 - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + gap;
 	}
 }
 

@@ -74,8 +74,13 @@ private:
 	RGBQUAD		  m_videoEffects[640*480]; //for drawing special effects on top.
 
 	USHORT		  m_playerMap[640*480];
-	UINT		  m_box;
+	UINT		  m_numHBox;
+	UINT		  m_numVBox;
+	UINT		  m_boxHeight;
+	UINT		  m_boxWidth;
 	UINT		  m_offset;
+	UINT		  m_p1Index;
+	UINT		  m_p2Index;
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;
     int           m_FramesTotal;

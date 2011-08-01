@@ -79,8 +79,10 @@ private:
 	UINT		  m_boxHeight;
 	UINT		  m_boxWidth;
 	UINT		  m_offset;
-	UINT		  m_p1Index;
-	UINT		  m_p2Index;
+	int			  m_p1Index;
+	int			  m_p2Index;
+	int *		  m_selectedShape;
+
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;
     int           m_FramesTotal;

@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "SkeletalViewer.h"
 #include "resource.h"
+#include "ShapeLibrary.h"
 
 // Global Variables:
 CSkeletalViewerApp	g_CSkeletalViewerApp;	// Application class
@@ -33,18 +34,42 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 	//Codes here:
 	//http://msdn.microsoft.com/en-us/library/dd375731(v=vs.85).aspx
 
+	int ori = 0;
+
 	switch(keyCode)
 	{
 		case 0x31 : //key 1
-
+			ori = rand() % Shapes::ori[0];
+			m_selectedShape = Shapes::I[ori];
+			break;
+		case 0x32 : //key 2
+			ori = rand() % Shapes::ori[1];
+			m_selectedShape = Shapes::J[ori];
+			break;
+		case 0x33 : //key 3
+			ori = rand() % Shapes::ori[2];
+			m_selectedShape = Shapes::L[ori];
+			break;
+		case 0x34 : //key 4
+			ori = rand() % Shapes::ori[3];
+			m_selectedShape = Shapes::O[ori];
+			break;
+		case 0x35 : //key 5
+			ori = rand() % Shapes::ori[4];
+			m_selectedShape = Shapes::Z[ori];
+			break;
+		case 0x36 : //key 6
+			ori = rand() % Shapes::ori[5];
+			m_selectedShape = Shapes::T[ori];
+			break;
+		case 0x37 : //key 7
+			ori = rand() % Shapes::ori[6];
+			m_selectedShape = Shapes::S[ori];
 			break;
 		case 0x43 : //key C
 			CapturePicture();
-			
-
 			break;
 	}
-
 }
 
 

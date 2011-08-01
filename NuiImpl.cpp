@@ -75,8 +75,11 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	m_boxWidth = 100;
 	m_offset = 80;
 
-	m_p1Index = 0;
-	m_p2Index = 0;
+	m_p1Index = -1;
+	m_p2Index = -1;
+	
+	srand((UINT) GetTickCount64());
+	m_selectedShape = NULL;
 
 	m_NumCapturedPictures = 0;
 
@@ -387,7 +390,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
         RGBQUAD * rgbrun = m_rgbWk;
         USHORT * pBufferRun = (USHORT*) pBuffer;
 		USHORT player, depth;
-		UINT curP1Index = 0, curP2Index = 0; 
+		int curP1Index = -1, curP2Index = -1; 
 		long colorX = 0, colorY = 0;
 		long bigPixel[4];
 		long MAX = 640 * 480;
@@ -400,9 +403,9 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 				if (player != 0) 
 				{
-					if (curP1Index == 0) {
+					if (curP1Index == -1) {
 						curP1Index = player;
-					} else if (curP2Index == 0) {
+					} else if (curP2Index == -1 && player != curP1Index) {
 						curP2Index = player;
 					}
 
@@ -430,47 +433,63 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
             }
         }
 
-		// if P1 is not assigned and has dissappeared
-		if (m_p1Index == 0 || 
+		// if P1 is not assigned or has dissappeared
+		if (m_p1Index == -1 || 
 		   (m_p1Index != curP1Index && m_p1Index != curP2Index)) {
-			if (curP1Index != 0 && curP1Index != m_p2Index) {
+			if (curP1Index != -1 && curP1Index != m_p2Index) {
 				m_p1Index = curP1Index;
-				curP1Index = 0;
-			} else if (curP2Index != 0 && curP2Index != m_p2Index) {
+				curP1Index = -1;
+			} else if (curP2Index != -1 && curP2Index != m_p2Index) {
 				m_p1Index = curP2Index;
-				curP2Index = 0;
+				curP2Index = -1;
 			}
 		}
 		
-		if (m_p2Index == 0 || 
+		if (m_p2Index == -1 || 
 		   (m_p2Index != curP1Index && m_p2Index != curP2Index)) {
-			if (curP1Index != 0 && curP1Index != m_p1Index) {
+			if (curP1Index != -1 && curP1Index != m_p1Index) {
 				m_p2Index = curP1Index;
-				curP1Index = 0;
-			} else if (curP2Index != 0 && curP2Index != m_p1Index) {
+				curP1Index = -1;
+			} else if (curP2Index != -1 && curP2Index != m_p1Index) {
 				m_p2Index = curP2Index;
-				curP2Index = 0;
+				curP2Index = -1;
 			}
 		}
+		
 		//copy raw video to var for drawing effects (like tetris boxes) on top.
 		memcpy(m_videoEffects,m_videoCache,640*480*4);
 
-		//tetris box drawing
-		UINT shapeTemplate[24] = {
-			0, 0, 0, 0, 0, 0,
-			0, 0, 1, 0, 2, 2, 
-			0, 1, 1, 0, 2, 0, 
-			0, 0, 1, 0, 2, 0
-		};
-		
-		
-		RGBQUAD p1Matched		= {0x2f, 0xff, 0xad, 0x00};
+		RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
 		RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
 		RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
 		RGBQUAD p2Matched		= {0x82, 0xdd, 0xee, 0x00};
 		RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
 		RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
 		RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
+
+		/*RGBQUAD * pVideoRun = m_videoEffects;
+		pPlayerRun = m_playerMap;
+		for( int y = 0 ; y < 480 ; y++ )
+        {
+            for( int x = 0 ; x < 640; x++ )
+            {	
+				if (*pPlayerRun == 0) {
+					// show video
+				} else if (*pPlayerRun == m_p1Index) {
+					*pVideoRun = p1Matched;
+				} else if (*pPlayerRun == m_p2Index) {
+					*pVideoRun = p2Matched;
+				}
+
+				pVideoRun++;
+				pPlayerRun++;
+            }
+        }*/
+
+		//copy raw video to var for drawing effects (like tetris boxes) on top.
+		memcpy(m_videoEffects,m_videoCache,640*480*4);
+
+		//tetris box drawing
 		bool p1Passed = true, p2Passed = true;
 
 		int gap = 640 - m_boxWidth * m_numHBox;
@@ -500,7 +519,8 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 				pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
 			}
 
-			if (shapeTemplate[i] == 0) {
+			if (m_selectedShape == NULL || 
+				m_selectedShape[i] == 0) {
 				if (p1Score >= limit) {
 					p1Passed = false;
 					drawBox(i, &p1Out, 0.5);
@@ -510,27 +530,27 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 				} else {
 					drawBox(i, &ignored, 0.25);
 				}
-			} else if (shapeTemplate[i] == 1) {
+			} else if (m_selectedShape[i] == 1) {
 				if (p1Score < limit) {
 					p1Passed = false;
 					drawBox(i, &p1Unmatched, 0.5);
 				} else {
-					drawBox(i, &p1Matched, 0.25);
+					drawBox(i, &p1Matched, 0.4);
 				}
-			} else if (shapeTemplate[i] == 2) {
+			} else if (m_selectedShape[i] == 2) {
 				if (p2Score < limit) {
 					p2Passed = false;
 					drawBox(i, &p2Unmatched, 0.5);
 				} else {
-					drawBox(i, &p2Matched, 0.25);
+					drawBox(i, &p2Matched, 0.4);
 				}
 			}
 		}
 
 		m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
-		//picture-in-picture
-		double PIPscale = 0.3;
+		 //picture-in-picture
+		/*double PIPscale = 0.3;
 		RECT PIPRect;
 		//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
 		int width = 548;//640;
@@ -547,10 +567,9 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 			CapturedRect.bottom = height;
 
 			m_DrawVideo.DrawRect( (BYTE*) m_CapturedPictures[c], &CapturedRect);
-		}
+		}*/
 
 		m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
-
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
@@ -683,9 +702,9 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 		}
 
 		for (UINT k = 0; k < m_boxWidth - borderWidth * 2; k++) {
-			pixel->rgbBlue = (BYTE) color->rgbBlue * opacity + pixel->rgbBlue * (1 - opacity);
-			pixel->rgbGreen = (BYTE) color->rgbGreen * opacity + pixel->rgbGreen * (1 - opacity);
-			pixel->rgbRed = (BYTE) color->rgbRed * opacity + pixel->rgbRed * (1 - opacity);
+			pixel->rgbBlue = (BYTE) (color->rgbBlue * opacity + pixel->rgbBlue * (1 - opacity));
+			pixel->rgbGreen = (BYTE) (color->rgbGreen * opacity + pixel->rgbGreen * (1 - opacity));
+			pixel->rgbRed = (BYTE) (color->rgbRed * opacity + pixel->rgbRed * (1 - opacity));
 
 			pixel++;
 		}

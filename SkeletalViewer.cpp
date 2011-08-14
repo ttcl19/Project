@@ -68,8 +68,10 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 			break;
 		case 0x43 : //key C
 			CapturePicture();
-			break;
+			return;
 	}
+
+	m_timeLimit = GetTickCount64() + m_timeAvailable;
 }
 
 

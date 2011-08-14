@@ -82,6 +82,8 @@ private:
 	int			  m_p1Index;
 	int			  m_p2Index;
 	int *		  m_selectedShape;
+	ULONGLONG	  m_timeLimit;
+	ULONGLONG	  m_timeAvailable;
 
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;

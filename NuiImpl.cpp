@@ -81,6 +81,9 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	srand((UINT) GetTickCount64());
 	m_selectedShape = NULL;
 
+	m_timeLimit = 0;
+	m_timeAvailable = 10 * 1000;
+
 	m_NumCapturedPictures = 0;
 
     HRESULT                hr;
@@ -376,200 +379,218 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
     {
         BYTE * pBuffer = (BYTE*) LockedRect.pBits;
 
-		USHORT * pPlayerRun = m_playerMap;
-        for( int y = 0 ; y < 480 ; y++ )
-        {
-            for( int x = 0 ; x < 640 ; x++ )
-            {
-				*pPlayerRun = 0;
-				pPlayerRun++;
-			}
-		}
+		if (GetTickCount64() < m_timeLimit) {
 
-        // draw the bits to the bitmap
-        RGBQUAD * rgbrun = m_rgbWk;
-        USHORT * pBufferRun = (USHORT*) pBuffer;
-		USHORT player, depth;
-		int curP1Index = -1, curP2Index = -1; 
-		long colorX = 0, colorY = 0;
-		long bigPixel[4];
-		long MAX = 640 * 480;
-        for( int y = 0 ; y < 240 ; y++ )
-        {
-            for( int x = 0 ; x < 320 ; x++ )
-            {
-				depth = *pBufferRun & 0xfff8;
-				player = *pBufferRun & 7;
-
-				if (player != 0) 
+			USHORT * pPlayerRun = m_playerMap;
+			for( int y = 0 ; y < 480 ; y++ )
+			{
+				for( int x = 0 ; x < 640 ; x++ )
 				{
-					if (curP1Index == -1) {
-						curP1Index = player;
-					} else if (curP2Index == -1 && player != curP1Index) {
-						curP2Index = player;
-					}
-
-					NuiImageGetColorPixelCoordinatesFromDepthPixel(
-						NUI_IMAGE_RESOLUTION_640x480,
-						0, x, y, depth, &colorX, &colorY);
-
-						bigPixel[0] = colorY * 640 + colorX;
-						bigPixel[1] = bigPixel[0] + 1;
-						bigPixel[2] = bigPixel[0] + 640;
-						bigPixel[3] = bigPixel[2] + 1;
-
-						for (int i = 0; i < 4; i++) {
-							if (bigPixel[i] > MAX) {
-								break;
-							}
-							m_playerMap[bigPixel[i]] = player;
-						}
-				}
-
-                RGBQUAD quad = Nui_ShortToQuad_Depth( *pBufferRun );
-                pBufferRun++;
-                *rgbrun = quad;
-                rgbrun++;
-            }
-        }
-
-		// if P1 is not assigned or has dissappeared
-		if (m_p1Index == -1 || 
-		   (m_p1Index != curP1Index && m_p1Index != curP2Index)) {
-			if (curP1Index != -1 && curP1Index != m_p2Index) {
-				m_p1Index = curP1Index;
-				curP1Index = -1;
-			} else if (curP2Index != -1 && curP2Index != m_p2Index) {
-				m_p1Index = curP2Index;
-				curP2Index = -1;
-			}
-		}
-		
-		if (m_p2Index == -1 || 
-		   (m_p2Index != curP1Index && m_p2Index != curP2Index)) {
-			if (curP1Index != -1 && curP1Index != m_p1Index) {
-				m_p2Index = curP1Index;
-				curP1Index = -1;
-			} else if (curP2Index != -1 && curP2Index != m_p1Index) {
-				m_p2Index = curP2Index;
-				curP2Index = -1;
-			}
-		}
-		
-		//copy raw video to var for drawing effects (like tetris boxes) on top.
-		memcpy(m_videoEffects,m_videoCache,640*480*4);
-
-		RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
-		RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
-		RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
-		RGBQUAD p2Matched		= {0x82, 0xdd, 0xee, 0x00};
-		RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
-		RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
-		RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
-
-		/*RGBQUAD * pVideoRun = m_videoEffects;
-		pPlayerRun = m_playerMap;
-		for( int y = 0 ; y < 480 ; y++ )
-        {
-            for( int x = 0 ; x < 640; x++ )
-            {	
-				if (*pPlayerRun == 0) {
-					// show video
-				} else if (*pPlayerRun == m_p1Index) {
-					*pVideoRun = p1Matched;
-				} else if (*pPlayerRun == m_p2Index) {
-					*pVideoRun = p2Matched;
-				}
-
-				pVideoRun++;
-				pPlayerRun++;
-            }
-        }*/
-
-		//copy raw video to var for drawing effects (like tetris boxes) on top.
-		memcpy(m_videoEffects,m_videoCache,640*480*4);
-
-		//tetris box drawing
-		bool p1Passed = true, p2Passed = true;
-
-		int gap = 640 - m_boxWidth * m_numHBox;
-		int startX, startY;
-		UINT p1Score, p2Score;
-		UINT limit = 0.3 * m_boxHeight * m_boxWidth;
-
-		for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
-			startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
-			startY = (i / m_numHBox) * m_boxHeight + m_offset;
-			pPlayerRun = m_playerMap + startY * 640 + startX;
-
-			p1Score = 0;
-			p2Score = 0;
-			for (UINT j = 0; j < m_boxHeight; j++) {
-				for (UINT k = 0; k < m_boxWidth; k++) {
-					if (*pPlayerRun == m_p1Index) {
-						p1Score++;
-					}
-
-					if (*pPlayerRun == m_p2Index) {
-						p2Score++;
-					}
+					*pPlayerRun = 0;
 					pPlayerRun++;
 				}
-
-				pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
 			}
 
-			if (m_selectedShape == NULL || 
-				m_selectedShape[i] == 0) {
-				if (p1Score >= limit) {
-					p1Passed = false;
-					drawBox(i, &p1Out, 0.5);
-				} else if (p2Score >= limit) {
-					p2Passed = false;
-					drawBox(i, &p2Out, 0.5);
-				} else {
-					drawBox(i, &ignored, 0.25);
-				}
-			} else if (m_selectedShape[i] == 1) {
-				if (p1Score < limit) {
-					p1Passed = false;
-					drawBox(i, &p1Unmatched, 0.5);
-				} else {
-					drawBox(i, &p1Matched, 0.4);
-				}
-			} else if (m_selectedShape[i] == 2) {
-				if (p2Score < limit) {
-					p2Passed = false;
-					drawBox(i, &p2Unmatched, 0.5);
-				} else {
-					drawBox(i, &p2Matched, 0.4);
+			// draw the bits to the bitmap
+			RGBQUAD * rgbrun = m_rgbWk;
+			USHORT * pBufferRun = (USHORT*) pBuffer;
+			USHORT player, depth;
+			int curP1Index = -1, curP2Index = -1; 
+			long colorX = 0, colorY = 0;
+			long bigPixel[4];
+			long MAX = 640 * 480;
+			for( int y = 0 ; y < 240 ; y++ )
+			{
+				for( int x = 0 ; x < 320 ; x++ )
+				{
+					depth = *pBufferRun & 0xfff8;
+					player = *pBufferRun & 7;
+
+					if (player != 0) 
+					{
+						if (curP1Index == -1) {
+							curP1Index = player;
+						} else if (curP2Index == -1 && player != curP1Index) {
+							curP2Index = player;
+						}
+
+						NuiImageGetColorPixelCoordinatesFromDepthPixel(
+							NUI_IMAGE_RESOLUTION_640x480,
+							0, x, y, depth, &colorX, &colorY);
+
+							bigPixel[0] = colorY * 640 + colorX;
+							bigPixel[1] = bigPixel[0] + 1;
+							bigPixel[2] = bigPixel[0] + 640;
+							bigPixel[3] = bigPixel[2] + 1;
+
+							for (int i = 0; i < 4; i++) {
+								if (bigPixel[i] > MAX) {
+									break;
+								}
+								m_playerMap[bigPixel[i]] = player;
+							}
+					}
+
+					RGBQUAD quad = Nui_ShortToQuad_Depth( *pBufferRun );
+					pBufferRun++;
+					*rgbrun = quad;
+					rgbrun++;
 				}
 			}
+
+			// if P1 is not assigned or has dissappeared
+			if (m_p1Index == -1 || 
+			   (m_p1Index != curP1Index && m_p1Index != curP2Index)) {
+				if (curP1Index != -1 && curP1Index != m_p2Index) {
+					m_p1Index = curP1Index;
+					curP1Index = -1;
+				} else if (curP2Index != -1 && curP2Index != m_p2Index) {
+					m_p1Index = curP2Index;
+					curP2Index = -1;
+				}
+			}
+		
+			if (m_p2Index == -1 || 
+			   (m_p2Index != curP1Index && m_p2Index != curP2Index)) {
+				if (curP1Index != -1 && curP1Index != m_p1Index) {
+					m_p2Index = curP1Index;
+					curP1Index = -1;
+				} else if (curP2Index != -1 && curP2Index != m_p1Index) {
+					m_p2Index = curP2Index;
+					curP2Index = -1;
+				}
+			}
+		
+			//copy raw video to var for drawing effects (like tetris boxes) on top.
+			memcpy(m_videoEffects,m_videoCache,640*480*4);
+
+			RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
+			RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
+			RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
+			RGBQUAD p2Matched		= {0x82, 0xdd, 0xee, 0x00};
+			RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
+			RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
+			RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
+
+			/*RGBQUAD * pVideoRun = m_videoEffects;
+			pPlayerRun = m_playerMap;
+			for( int y = 0 ; y < 480 ; y++ )
+			{
+				for( int x = 0 ; x < 640; x++ )
+				{	
+					if (*pPlayerRun == 0) {
+						// show video
+					} else if (*pPlayerRun == m_p1Index) {
+						*pVideoRun = p1Matched;
+					} else if (*pPlayerRun == m_p2Index) {
+						*pVideoRun = p2Matched;
+					}
+
+					pVideoRun++;
+					pPlayerRun++;
+				}
+			}*/
+
+			//copy raw video to var for drawing effects (like tetris boxes) on top.
+			memcpy(m_videoEffects,m_videoCache,640*480*4);
+
+			//tetris box drawing
+			bool p1Passed = true, p2Passed = true;
+
+			int gap = 640 - m_boxWidth * m_numHBox;
+			int startX, startY;
+			UINT p1Score, p2Score;
+			UINT limit = 0.3 * m_boxHeight * m_boxWidth;
+
+			for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
+				startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
+				startY = (i / m_numHBox) * m_boxHeight + m_offset;
+				pPlayerRun = m_playerMap + startY * 640 + startX;
+
+				p1Score = 0;
+				p2Score = 0;
+				for (UINT j = 0; j < m_boxHeight; j++) {
+					for (UINT k = 0; k < m_boxWidth; k++) {
+						if (*pPlayerRun == m_p1Index) {
+							p1Score++;
+						}
+
+						if (*pPlayerRun == m_p2Index) {
+							p2Score++;
+						}
+						pPlayerRun++;
+					}
+
+					pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
+				}
+
+				if (m_selectedShape == NULL || 
+					m_selectedShape[i] == 0) {
+					if (p1Score >= limit) {
+						p1Passed = false;
+						drawBox(i, &p1Out, 0.5);
+					} else if (p2Score >= limit) {
+						p2Passed = false;
+						drawBox(i, &p2Out, 0.5);
+					} else {
+						drawBox(i, &ignored, 0.25);
+					}
+				} else if (m_selectedShape[i] == 1) {
+					if (p1Score < limit) {
+						p1Passed = false;
+						drawBox(i, &p1Unmatched, 0.5);
+					} else {
+						drawBox(i, &p1Matched, 0.4);
+					}
+				} else if (m_selectedShape[i] == 2) {
+					if (p2Score < limit) {
+						p2Passed = false;
+						drawBox(i, &p2Unmatched, 0.5);
+					} else {
+						drawBox(i, &p2Matched, 0.4);
+					}
+				}
+			}
+
+			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
+
+			if (p1Passed && p2Passed) {
+				bool chooseP1 = (rand() % 2 == 0);
+				p1Passed = chooseP1;
+				p2Passed = !chooseP1;
+			}
+
+			if (p1Passed) {
+				// capture image and send it over
+			} else if (p2Passed) {
+				// same as above
+			}
+
+			 //picture-in-picture
+			/*double PIPscale = 0.3;
+			RECT PIPRect;
+			//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
+			int width = 548;//640;
+			int height = 455;//480;
+
+			//draw RGB Captured
+			double CapturedScale = 0.2;
+			for (int c = 0; c < m_NumCapturedPictures; c++)
+			{
+				RECT CapturedRect;
+				CapturedRect.left = c*CapturedScale*width;
+				CapturedRect.right = (c+1)*CapturedScale*width;
+				CapturedRect.top = (long)(height - height*CapturedScale);
+				CapturedRect.bottom = height;
+
+				m_DrawVideo.DrawRect( (BYTE*) m_CapturedPictures[c], &CapturedRect);
+			}*/
+
+			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
+		
+		} else {
+			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}
-
-		m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
-
-		 //picture-in-picture
-		/*double PIPscale = 0.3;
-		RECT PIPRect;
-		//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
-		int width = 548;//640;
-		int height = 455;//480;
-
-		//draw RGB Captured
-		double CapturedScale = 0.2;
-		for (int c = 0; c < m_NumCapturedPictures; c++)
-		{
-			RECT CapturedRect;
-			CapturedRect.left = c*CapturedScale*width;
-			CapturedRect.right = (c+1)*CapturedScale*width;
-			CapturedRect.top = (long)(height - height*CapturedScale);
-			CapturedRect.bottom = height;
-
-			m_DrawVideo.DrawRect( (BYTE*) m_CapturedPictures[c], &CapturedRect);
-		}*/
-
-		m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 

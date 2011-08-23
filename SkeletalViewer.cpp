@@ -123,12 +123,14 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 			break;
 		case 0x43 : //key C
 			CapturePicture();
-			break;
+			return;
 		case 0x54: //key T.
 			TwitterPost(0,0, 0, 0, 640, 480);
 			break;
 
 	}
+
+	m_timeLimit = GetTickCount64() + m_timeAvailable;
 }
 
 int MessageBoxResource(HWND hwnd,UINT nID,UINT nType)

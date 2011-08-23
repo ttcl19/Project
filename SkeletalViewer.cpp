@@ -23,11 +23,66 @@
 #include "resource.h"
 #include "ShapeLibrary.h"
 
+#include <iostream>
+#include <sstream>
+
 // Global Variables:
 CSkeletalViewerApp	g_CSkeletalViewerApp;	// Application class
 HINSTANCE			g_hInst;				// current instance
 HWND				g_hWndApp;				// Windows Handle to main application
 TCHAR				g_szAppTitle[256];		// Application title
+
+extern "C" _declspec(dllexport) void openKinectWindow();
+extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, void* ptr));
+
+extern "C" _declspec(dllexport) int numericCommand(int cmd);
+
+int numericCommand(int cmd) {
+	return g_CSkeletalViewerApp.numericCommand(cmd);
+}
+
+int CSkeletalViewerApp::numericCommand(int cmd)
+{
+	int ori = 0;
+
+	switch(cmd)
+	{
+		case 1:
+			ori = rand() % Shapes::ori[0];
+			m_selectedShape = Shapes::I[ori];
+			break;
+		case 2:
+			ori = rand() % Shapes::ori[1];
+			m_selectedShape = Shapes::J[ori];
+			break;
+		case 3:
+			ori = rand() % Shapes::ori[2];
+			m_selectedShape = Shapes::L[ori];
+			break;
+		case 4:
+			ori = rand() % Shapes::ori[3];
+			m_selectedShape = Shapes::O[ori];
+			break;
+		case 5:
+			ori = rand() % Shapes::ori[4];
+			m_selectedShape = Shapes::Z[ori];
+			break;
+		case 6:
+			ori = rand() % Shapes::ori[5];
+			m_selectedShape = Shapes::T[ori];
+			break;
+		case 7:
+			ori = rand() % Shapes::ori[6];
+			m_selectedShape = Shapes::S[ori];
+			break;
+
+		case 0: //force tweet
+			TwitterPost(0,0,0,0,640,480);
+			break;
+	}
+
+	return 0;
+}
 
 void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 {
@@ -69,16 +124,13 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 		case 0x43 : //key C
 			CapturePicture();
 			break;
+		case 0x54: //key T.
+			TwitterPost(0,0, 0, 0, 640, 480);
+			break;
+
 	}
 }
 
-
-/*****************************************************************************/
-/* int MessageBoxResourceV(HWND hwnd,UINT nID,UINT nType, ... )
-/*
-/* Superset of MessageBox functionality allowing a user to specify a String
-/* table loaded string 
-/*****************************************************************************/
 int MessageBoxResource(HWND hwnd,UINT nID,UINT nType)
 {
 static TCHAR szRes[512];
@@ -94,9 +146,6 @@ return (nRet);
 
 	switch(message)
 	{
-	    case WM_CREATE:
-
-			break;
 		case WM_INITDIALOG:
 			{
 			LOGFONT lf;
@@ -137,8 +186,59 @@ return (nRet);
 	return (FALSE);
 }
 
+int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation,int w, int h,void* ptr))
+{
+	g_CSkeletalViewerApp.globalAlloc = globalAlloc;
+	g_CSkeletalViewerApp.TweetPicture = TweetPicture;
+	return 0;
+}
+
+void openKinectWindow()
+{
+	MSG			msg;
+	WNDCLASS	wc;
+
+	LoadString(g_hInst,IDS_APPTITLE,g_szAppTitle,sizeof(g_szAppTitle)/sizeof(g_szAppTitle[0]));
+
+	// Dialog custom window class
+	ZeroMemory(&wc,sizeof(wc));
+	wc.style=CS_HREDRAW | CS_VREDRAW;
+	wc.cbWndExtra=DLGWINDOWEXTRA;
+	wc.hInstance=g_hInst;
+	wc.hCursor=LoadCursor(NULL,IDC_ARROW);
+	wc.hIcon=LoadIcon(g_hInst,MAKEINTRESOURCE(IDI_SKELETALVIEWER));
+	wc.lpfnWndProc=DefDlgProc;
+	wc.lpszClassName=SZ_APPDLG_WINDOW_CLASS;
+	if(!RegisterClass(&wc))
+		return;
+
+	// Create main application window
+	g_hWndApp=CreateDialogParam(g_hInst,MAKEINTRESOURCE(IDD_APP),NULL,(DLGPROC) CSkeletalViewerApp::WndProc,NULL);
+
+	// Show window
+	ShowWindow(g_hWndApp,SW_SHOW);
+	UpdateWindow(g_hWndApp);
+
+	// Main message loop:
+	while(GetMessage(&msg,NULL,0,0)) 
+	{
+		// If a dialog message
+		if(g_hWndApp!=NULL && IsDialogMessage(g_hWndApp,&msg))
+			continue;
+
+		// otherwise do default window processing
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+    }
+}
+
 int APIENTRY _tWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow)
 {
+	//cURL stuff
+	//curl_global_init(CURL_GLOBAL_ALL);
+
+
+
 	LoadString(g_hInst,IDS_APPTITLE,g_szAppTitle,sizeof(g_szAppTitle)/sizeof(g_szAppTitle[0]));
 
 	// Dialog custom window class
@@ -218,6 +318,35 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdL
 	return (msg.wParam);
 }
 
+
+
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+					 )
+{
+	//HMODULE is equivalent to HINSTANCE
+	
+	switch ( ul_reason_for_call )
+	{
+		case DLL_PROCESS_ATTACH:
+		// A process is loading the DLL.
+		break;
+		case DLL_THREAD_ATTACH:
+		// A process is creating a new thread.
+		break;
+		case DLL_THREAD_DETACH:
+		// A thread exits normally.
+		break;
+		case DLL_PROCESS_DETACH:
+		// A process unloads the DLL.
+		break;
+	}
+	
+	g_hInst = hModule;
+
+	return TRUE;
+}
 
 
 

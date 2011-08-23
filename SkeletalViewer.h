@@ -39,11 +39,15 @@ public:
     static LONG CALLBACK    WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     HWND m_hWnd;
+	HFONT					m_hFontFPS;
 
 	void					KeyboardInput(WPARAM keyCode);
 	void					CapturePicture();
+	int						(*TweetPicture)(int shape, int orientation,int w, int h,void* ptr);
+    void*					(*globalAlloc)(int size);
 
-    HFONT					m_hFontFPS;
+	int			TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
+	int						numericCommand(int cmd);
 
 private:
     static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);

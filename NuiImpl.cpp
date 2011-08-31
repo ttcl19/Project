@@ -308,13 +308,14 @@ DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
 
 void CSkeletalViewerApp::Nui_GotVideoAlert( )
 {
-
+	//GetTickCount64 gets the time in milliseconds since the initiation of the program 
 	if (GetTickCount64() > m_videoDelay && m_videoDelay != 0) {
 		m_videoDelay = 0;
 	} else {
 		return;
 	}
 	m_FramesTotal++;
+	//The pImageFrame member of NUI_IMAGE_FRAME is of type NuiImageBuffer 
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
 
     HRESULT hr = NuiImageStreamGetNextFrame(
@@ -381,11 +382,13 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 		if (GetTickCount64() < m_timeLimit) {
 
+			//Copying the array to PlayerRun pointer 
 			USHORT * pPlayerRun = m_playerMap;
 			for( int y = 0 ; y < 480 ; y++ )
 			{
 				for( int x = 0 ; x < 640 ; x++ )
 				{
+					//Zeroing the array 
 					*pPlayerRun = 0;
 					pPlayerRun++;
 				}
@@ -395,10 +398,14 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 			RGBQUAD * rgbrun = m_rgbWk;
 			USHORT * pBufferRun = (USHORT*) pBuffer;
 			USHORT player, depth;
+
+			//Player indices 
 			int curP1Index = -1, curP2Index = -1; 
 			long colorX = 0, colorY = 0;
 			long bigPixel[4];
 			long MAX = 640 * 480;
+
+			//Half of the screen 
 			for( int y = 0 ; y < 240 ; y++ )
 			{
 				for( int x = 0 ; x < 320 ; x++ )
@@ -406,18 +413,23 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 					depth = *pBufferRun & 0xfff8;
 					player = *pBufferRun & 7;
 
+					//If the pixel is occupied by the player, then it would be 1 
 					if (player != 0) 
 					{
 						if (curP1Index == -1) {
 							curP1Index = player;
+							//Occurence of the second player 
 						} else if (curP2Index == -1 && player != curP1Index) {
 							curP2Index = player;
 						}
 
+						//Matching colour coordinates with depth 
+						//Returned values are directly saved in two of its parameters 
+						//(colorx and color y) 
 						NuiImageGetColorPixelCoordinatesFromDepthPixel(
 							NUI_IMAGE_RESOLUTION_640x480,
 							0, x, y, depth, &colorX, &colorY);
-
+							//bigger pixels for the tetris boxes 
 							bigPixel[0] = colorY * 640 + colorX;
 							bigPixel[1] = bigPixel[0] + 1;
 							bigPixel[2] = bigPixel[0] + 640;
@@ -464,6 +476,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 			//copy raw video to var for drawing effects (like tetris boxes) on top.
 			memcpy(m_videoEffects,m_videoCache,640*480*4);
 
+			//Assigns the colours and effects of each respective case 
 			RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
 			RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
 			RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
@@ -502,13 +515,18 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 			UINT p1Score, p2Score;
 			UINT limit = 0.3 * m_boxHeight * m_boxWidth;
 
+			//m_numHBox was initialized to be 6 in Nui_init
 			for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
 				startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
 				startY = (i / m_numHBox) * m_boxHeight + m_offset;
 				pPlayerRun = m_playerMap + startY * 640 + startX;
 
+
+				//Calculates the scores 
 				p1Score = 0;
 				p2Score = 0;
+				//m_p1Index was initialized to be -1 
+				//If pPlayerRun == m_p1Index then the player occupies that pixel 
 				for (UINT j = 0; j < m_boxHeight; j++) {
 					for (UINT k = 0; k < m_boxWidth; k++) {
 						if (*pPlayerRun == m_p1Index) {
@@ -524,6 +542,15 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 					pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
 				}
 
+				//colours the box in if the player occupies the threshold score 
+				//m_selectedshape is defined in the header file(SkeletalViewer.h)
+				//and it contains information about the selected shape, where it was
+				//coloured and such 
+				//the if statements here basically checks if there exists a number(an 
+				//indicator for the colour the box needs to be coloured in) and colours
+				//them appropriately
+				//m_selectedsahpe points to an array containing the bitmap of the desire of 
+				//the desired shape with 0,1 and 2. etc. 
 				if (m_selectedShape == NULL || 
 					m_selectedShape[i] == 0) {
 					if (p1Score >= limit) {
@@ -562,8 +589,15 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 			if (p1Passed) {
 				// capture image and send it over
+				// twitter post 
+				
+				TwitterPost(ShapeIndex, ori, 0, 0, m_boxWidth/2,m_boxHeight);
+
+
 			} else if (p2Passed) {
 				// same as above
+
+				TwitterPost(ShapeIndex, ori, m_boxWidth/2, 0, m_boxWidth, m_boxHeight); 
 			}
 
 			 //picture-in-picture
@@ -701,6 +735,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 	int gap = 640 - m_boxWidth * m_numHBox;
 	int startX, startY;
 	UINT borderWidth = 1;
+	//black 
 	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
 
 	startX = (boxIndex % m_numHBox) * m_boxWidth + gap / 2;			

@@ -43,37 +43,46 @@ int numericCommand(int cmd) {
 
 int CSkeletalViewerApp::numericCommand(int cmd)
 {
-	int ori = 0;
+	ori = 0;
 
 	switch(cmd)
 	{
 		case 1:
 			ori = rand() % Shapes::ori[0];
 			m_selectedShape = Shapes::I[ori];
+			//make note of the selected shape as a number
+			//to be passed onto TwitterPost 
+			ShapeIndex = 1; 
 			break;
 		case 2:
 			ori = rand() % Shapes::ori[1];
 			m_selectedShape = Shapes::J[ori];
+			ShapeIndex = 2; 
 			break;
 		case 3:
 			ori = rand() % Shapes::ori[2];
 			m_selectedShape = Shapes::L[ori];
+			ShapeIndex = 3; 
 			break;
 		case 4:
 			ori = rand() % Shapes::ori[3];
 			m_selectedShape = Shapes::O[ori];
+			ShapeIndex = 4; 
 			break;
 		case 5:
 			ori = rand() % Shapes::ori[4];
 			m_selectedShape = Shapes::Z[ori];
+			ShapeIndex = 5; 
 			break;
 		case 6:
 			ori = rand() % Shapes::ori[5];
 			m_selectedShape = Shapes::T[ori];
+			ShapeIndex = 6; 
 			break;
 		case 7:
 			ori = rand() % Shapes::ori[6];
 			m_selectedShape = Shapes::S[ori];
+			ShapeIndex = 7; 
 			break;
 
 		case 0: //force tweet
@@ -94,6 +103,8 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 	switch(keyCode)
 	{
 		case 0x31 : //key 1
+			//the remainder here will always be less than the number of orientations 
+			//for each respective shape 
 			ori = rand() % Shapes::ori[0];
 			m_selectedShape = Shapes::I[ori];
 			break;

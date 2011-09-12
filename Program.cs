@@ -39,7 +39,7 @@ namespace BodyTetrisWrapper
             return memPtr;
         }
 
-        static Twitpic twitter = new Twitpic();
+        static Twitpic twitter = new Twitpic("TweetrisTO","squiggle");
 
         static int numPhotos = 0;
 
@@ -68,7 +68,7 @@ namespace BodyTetrisWrapper
                     w*3);
 
                 string TweetString = Tetronimos.GetString(shape, orientation);
-                string TweetFileName = TweetString + " " + numPhotos + ".png";
+                string TweetFileName = "" + TweetString + " " + numPhotos + ".png";
 
 
                 FileStream stream = new FileStream(TweetFileName, FileMode.Create);
@@ -83,7 +83,7 @@ namespace BodyTetrisWrapper
                 //TODO upload tweet photo.
 
 
-                //HACK twitter.UploadPhoto(pixels, TweetString, TweetFileName);
+                twitter.UploadPhoto(pixels, TweetString, TweetFileName);
             }
             catch (Exception e)
             {
@@ -123,6 +123,7 @@ namespace BodyTetrisWrapper
                 {
                     //string commands.
                 }
+                input = "";
 
                 //yes, this is an infinite loop. Behold!
             }

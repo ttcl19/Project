@@ -587,23 +587,27 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
-			if (p1Passed && p2Passed) {
-				bool chooseP1 = (rand() % 2 == 0);
-				p1Passed = chooseP1;
-				p2Passed = !chooseP1;
-			}
+			if (ShapeIndex > 0) {
 
-			if (p1Passed) {
-				// capture image and send it over
-				// twitter post 
+				if (p1Passed && p2Passed) {
+					bool chooseP1 = (rand() % 2 == 0);
+					p1Passed = chooseP1;
+					p2Passed = !chooseP1;
+				}
+
+				if (p1Passed) {
+					// capture image and send it over
+					// twitter post 
 				
-				TwitterPost(ShapeIndex, ori, 0, 0, m_boxWidth/2,m_boxHeight);
+					TwitterPost(ShapeIndex, ori, 0, 0, m_boxWidth/2,m_boxHeight);
 
 
-			} else if (p2Passed) {
-				// same as above
+				} else if (p2Passed) {
+					// same as above
 
-				TwitterPost(ShapeIndex, ori, m_boxWidth/2, 0, m_boxWidth, m_boxHeight); 
+					TwitterPost(ShapeIndex, ori, m_boxWidth/2, 0, m_boxWidth, m_boxHeight); 
+				}
+
 			}
 
 			 //picture-in-picture

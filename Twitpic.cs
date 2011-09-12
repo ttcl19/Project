@@ -37,7 +37,10 @@ namespace BodyTetrisWrapper
         private const string ImageTiffFileExtension = ".tiff";
         private const string ImagePngFileExtension = ".png";
 
-        public Twitpic() { }
+        public Twitpic(string Username, string Password) {
+            this.Username = Username;
+            this.Password = Password;
+        }
 
         private static string GetImageContentType(string imageUriString)
         {

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkeletalViewer", "SkeletalViewer.vcxproj", "{598188FB-FFFE-4D88-8A3A-8AF295DAD351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BodyTetrisWrapper", "BodyTetrisWrapper\BodyTetrisWrapper.csproj", "{AA2FE514-FB23-40C7-88AC-716936A34F75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BodyTetrisWrapper", "BodyTetrisWrapper.csproj", "{AA2FE514-FB23-40C7-88AC-716936A34F75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

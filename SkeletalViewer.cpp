@@ -45,6 +45,7 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 {
 	ori = 0;
 
+
 	switch(cmd)
 	{
 		case 1:
@@ -90,6 +91,7 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 			break;
 	}
 
+	m_timeLimit = GetTickCount64() + m_timeAvailable;
 	return 0;
 }
 

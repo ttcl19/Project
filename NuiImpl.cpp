@@ -362,6 +362,8 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 {
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
 
+	
+
     HRESULT hr = NuiImageStreamGetNextFrame(
         m_pDepthStreamHandle,
         0,
@@ -372,6 +374,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
         return;
     }
 
+
     NuiImageBuffer * pTexture = pImageFrame->pFrameTexture;
     KINECT_LOCKED_RECT LockedRect;
     pTexture->LockRect( 0, &LockedRect, NULL, 0 );
@@ -381,6 +384,8 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
         BYTE * pBuffer = (BYTE*) LockedRect.pBits;
 
 		if (GetTickCount64() < m_timeLimit) {
+
+
 
 			//Copying the array to PlayerRun pointer 
 			USHORT * pPlayerRun = m_playerMap;
@@ -508,6 +513,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 			memcpy(m_videoEffects,m_videoCache,640*480*4);
 
 			//tetris box drawing
+
 			bool p1Passed = true, p2Passed = true;
 
 			int gap = 640 - m_boxWidth * m_numHBox;

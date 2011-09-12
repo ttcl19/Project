@@ -93,7 +93,7 @@ private:
 
 
 	ULONGLONG	  m_timeLimit;
-	ULONGLONG	  m_timeAvailable;
+	ULONGLONG	  m_timeAvailable; //What is this? - Dustin
 
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;

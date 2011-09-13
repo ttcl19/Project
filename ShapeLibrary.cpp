@@ -2,6 +2,7 @@
 #include "ShapeLibrary.h"
 
 //WARNING: updating any shape requires updating a bunch of stuff in this class. Careful!
+//Also, Tetronimoes in C# project. Ugh.
 
 namespace Shapes {
 	

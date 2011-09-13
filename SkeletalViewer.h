@@ -88,7 +88,9 @@ private:
 	UINT		  m_numVBox;
 	UINT		  m_boxHeight;
 	UINT		  m_boxWidth;
-	UINT		  m_offset;
+	UINT		  y_box_offset;
+	UINT		  x_box_offset;
+
 	int			  m_p1Index;
 	int			  m_p2Index;
 	int *		  m_selectedShape;

@@ -52,6 +52,8 @@ namespace BodyTetrisWrapper
                 byte[] pixels = new byte[w * h * 3];
                 Marshal.Copy(ptr, pixels, 0, w * h * 3);
 
+                BlackOut(pixels,shape,orientation,w,h);
+
                 // Define the image palette
                 BitmapPalette myPalette = BitmapPalettes.Halftone256;
 
@@ -82,6 +84,10 @@ namespace BodyTetrisWrapper
                 //TODO upload tweet photo.
 
                 //HACK twitter.UploadPhoto(pixels, TweetString, TweetFileName);
+            
+                //TODO send and cut up mini-photos.
+            
+            
             }
             catch (Exception e)
             {
@@ -126,6 +132,27 @@ namespace BodyTetrisWrapper
                 //yes, this is an infinite loop. Behold!
             }
 
+        }
+
+        static void BlackOut(byte[] pixels, int shape, int orientation, int w, int h)
+        {
+            //Blacks out the pixels that aren't part of the shape.
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    if (!Tetronimos.IsIn(shape, orientation, x, y, w, h))
+                    {
+                        //blacken pixel
+                        int index = x + y*w;
+
+                        pixels[3 * index] = 0;
+                        pixels[3 * index + 1] = 0;
+                        pixels[3 * index + 2] = 0;
+                    }
+                }
+            }
         }
     }
 }

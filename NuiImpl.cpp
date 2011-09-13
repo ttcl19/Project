@@ -69,7 +69,7 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	m_numVBox = 4;
 	m_boxHeight = 100;
 	m_boxWidth = 100;
-	m_offset = 80;
+	y_box_offset = 80;
 
 	m_p1Index = -1;
 	m_p2Index = -1;
@@ -482,25 +482,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
 			RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
 
-			/*RGBQUAD * pVideoRun = m_videoEffects;
-			pPlayerRun = m_playerMap;
-			for( int y = 0 ; y < 480 ; y++ )
-			{
-				for( int x = 0 ; x < 640; x++ )
-				{	
-					if (*pPlayerRun == 0) {
-						// show video
-					} else if (*pPlayerRun == m_p1Index) {
-						*pVideoRun = p1Matched;
-					} else if (*pPlayerRun == m_p2Index) {
-						*pVideoRun = p2Matched;
-					}
-
-					pVideoRun++;
-					pPlayerRun++;
-				}
-			}*/
-
 			//copy raw video to var for drawing effects (like tetris boxes) on top.
 			memcpy(m_videoEffects,m_videoCache,640*480*4);
 
@@ -516,7 +497,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			//m_numHBox was initialized to be 6 in Nui_init
 			for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
 				startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
-				startY = (i / m_numHBox) * m_boxHeight + m_offset;
+				startY = (i / m_numHBox) * m_boxHeight + y_box_offset;
 				pPlayerRun = m_playerMap + startY * 640 + startX;
 
 
@@ -579,7 +560,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
-			printf("ShapeIndex %d\n",ShapeIndex);
+			//printf("ShapeIndex %d\n",ShapeIndex);
 
 			if (ShapeIndex > 0) {
 
@@ -593,10 +574,10 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					int pPassedNum = p1Passed ? 1 : 2;
 
-					TwitterPost(ShapeIndex, ori, Shapes::X1(ShapeIndex,ori,pPassedNum)*m_boxWidth, 
-						Shapes::Y1(ShapeIndex,ori,pPassedNum)*m_boxHeight, 
-						Shapes::X2(ShapeIndex,ori,pPassedNum)*m_boxWidth,
-						Shapes::Y2(ShapeIndex,ori,pPassedNum)*m_boxHeight);
+					TwitterPost(ShapeIndex, ori, Shapes::X1(ShapeIndex,ori,pPassedNum)*m_boxWidth +x_box_offset, 
+						Shapes::Y1(ShapeIndex,ori,pPassedNum)*m_boxHeight+y_box_offset, 
+						Shapes::X2(ShapeIndex,ori,pPassedNum)*m_boxWidth+x_box_offset,
+						Shapes::Y2(ShapeIndex,ori,pPassedNum)*m_boxHeight+y_box_offset);
 
 					//image captured - hide shape.
 
@@ -741,14 +722,14 @@ void CSkeletalViewerApp::Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSke
 }
 
 void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) {
-	int gap = 640 - m_boxWidth * m_numHBox;
+	x_box_offset = 640 - m_boxWidth * m_numHBox;
 	int startX, startY;
 	UINT borderWidth = 1;
 	//black 
 	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
 
-	startX = (boxIndex % m_numHBox) * m_boxWidth + gap / 2;			
-	startY = (boxIndex / m_numHBox) * m_boxHeight + m_offset;
+	startX = (boxIndex % m_numHBox) * m_boxWidth + x_box_offset / 2;			
+	startY = (boxIndex / m_numHBox) * m_boxHeight + y_box_offset;
 	RGBQUAD * pixel = m_videoEffects + startY * 640 + startX;
 	// top border
 	for (UINT j = 0; j < borderWidth; j++) {
@@ -756,7 +737,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 			*pixel = borderColor;
 			pixel++;
 		}
-		pixel += m_boxWidth * (m_numHBox - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + x_box_offset;
 	}
 
 	for (UINT j = 0; j < m_boxHeight - borderWidth * 2; j++) {
@@ -780,7 +761,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 			pixel++;
 		}
 
-		pixel += m_boxWidth * (m_numHBox - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + x_box_offset;
 	}
 
 	// bottom border
@@ -789,7 +770,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 			*pixel = borderColor;
 			pixel++;
 		}
-		pixel += m_boxWidth * (m_numHBox - 1) + gap;
+		pixel += m_boxWidth * (m_numHBox - 1) + x_box_offset;
 	}
 }
 

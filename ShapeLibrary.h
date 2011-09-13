@@ -23,7 +23,7 @@ namespace Shapes {
 	extern int ori[];
 
 	//holds all the integer-valued bounds on objects
-	extern int bounds[7][4][2][4];;
+	extern int bounds[7][4][2][4];
 
 	inline int boundsIndex(int ShapeIndex, int ori, int player, int bound)
 	{

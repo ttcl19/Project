@@ -1,13 +1,10 @@
-Want to set up the following loop:
-- make shape
-- new random shape...
-
-
 
 Upload as new shape format:
-- Don't change how C++ passes it
 - C# sends full shape tweetristo
   - must black out irrelevant areas
+
+Sent images seem to be universally too high up.
+
 - C# cuts shape up into sub-shape squares:
   - posts each to TweetrisTOshh (password: squiggle), according to derek's format
 

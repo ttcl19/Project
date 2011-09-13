@@ -42,10 +42,37 @@ int numericCommand(int cmd) {
 
 int CSkeletalViewerApp::numericCommand(int cmd)
 {
+	if (cmd >= 1 && cmd <= 7)
+	{
+		newShape(cmd);
+	} else {
+		switch(cmd)
+		{
+			case -1: //random shape
+				newRandomShape();
+				break;
+
+			case 0: //force tweet
+				TwitterPost(0,0,0,0,640,480);
+				break;
+		}
+	}
+	
+	return 0;
+}
+
+int CSkeletalViewerApp::newRandomShape()
+{
+	int shape = rand() % 8;
+	newShape(shape);
+	return shape;
+}
+
+void CSkeletalViewerApp::newShape(int newShapeIndex)
+{
 	ori = 0;
 
-
-	switch(cmd)
+	switch(newShapeIndex)
 	{
 		case 1:
 			ori = rand() % Shapes::ori[0];
@@ -84,14 +111,9 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 			m_selectedShape = Shapes::S[ori];
 			ShapeIndex = 7; 
 			break;
-
-		case 0: //force tweet
-			TwitterPost(0,0,0,0,640,480);
-			break;
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
-	return 0;
 }
 
 void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)

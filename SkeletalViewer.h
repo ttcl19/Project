@@ -49,8 +49,11 @@ public:
 	int						(*TweetPicture)(int shape, int orientation,int w, int h,void* ptr);
     void*					(*globalAlloc)(int size);
 
-	int			TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
+	int						TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
 	int						numericCommand(int cmd);
+
+	void					newShape(int ShapeIndex);
+	int						newRandomShape();
 
 private:
     static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);
@@ -96,7 +99,7 @@ private:
 
 
 	ULONGLONG	  m_timeLimit;
-	ULONGLONG	  m_timeAvailable; //What is this? - Dustin
+	ULONGLONG	  m_timeAvailable; //Before Round ends
 
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;

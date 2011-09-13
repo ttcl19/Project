@@ -1,8 +1,8 @@
-Move shapes after J from ShapeLibrary.h to .cpp Yay!
+Want to set up the following loop:
+- make shape
+- new random shape...
 
 
-Doesn't twitterpost correct area.
-- X1, Y1, X2, Y2 not working
 
 Upload as new shape format:
 - Don't change how C++ passes it
@@ -15,3 +15,5 @@ Upload as new shape format:
 Twitpic detecting as video...why?
 
 Incorporate Kinect To Max project (OSC to Max/MSP) into main project according to Kyle's message format.
+
+Have debug vs real window configuration.

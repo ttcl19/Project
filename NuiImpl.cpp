@@ -41,9 +41,6 @@ static const COLORREF g_JointColorTable[NUI_SKELETON_POSITION_COUNT] =
     RGB(77,  109, 243) // NUI_SKELETON_POSITION_FOOT_RIGHT
 };
 
-
-
-
 void CSkeletalViewerApp::Nui_Zero()
 {
     m_hNextDepthFrameEvent = NULL;
@@ -66,8 +63,6 @@ void CSkeletalViewerApp::Nui_Zero()
     m_LastFramesTotal = 0;
 }
 
-
-
 HRESULT CSkeletalViewerApp::Nui_Init()
 {
 	m_numHBox = 6;
@@ -83,7 +78,7 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	m_selectedShape = NULL;
 
 	m_timeLimit = 0;
-	m_timeAvailable = 10 * 1000;
+	m_timeAvailable = 100 * 1000;
 
 	m_NumCapturedPictures = 0;
 
@@ -359,11 +354,9 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
 }
 
 
-void CSkeletalViewerApp::Nui_GotDepthAlert( )
+void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of the interaction happens.
 {
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
-
-	
 
     HRESULT hr = NuiImageStreamGetNextFrame(
         m_pDepthStreamHandle,
@@ -385,9 +378,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
         BYTE * pBuffer = (BYTE*) LockedRect.pBits;
 
 		if (GetTickCount64() < m_timeLimit) {
-
-
-
+			
 			//Copying the array to PlayerRun pointer 
 			USHORT * pPlayerRun = m_playerMap;
 			for( int y = 0 ; y < 480 ; y++ )
@@ -588,6 +579,8 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
+			printf("ShapeIndex %d\n",ShapeIndex);
+
 			if (ShapeIndex > 0) {
 
 				if (p1Passed || p2Passed)
@@ -608,8 +601,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 					//image captured - hide shape.
 
 					//TODO "flash" effect or something awesome.
-					m_timeLimit = 0; //HACK This is hacky and doesn't feel right - Dustin
 
+					m_timeLimit = 0; //This line would end gameplay if you wanted.
+
+					//TODO new shape
+					newRandomShape();
 				}
 			}
 

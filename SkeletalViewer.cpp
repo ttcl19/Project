@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include "SkeletalViewer.h"
 #include "resource.h"
-#include "ShapeLibrary.h"
 
 #include <iostream>
 #include <sstream>

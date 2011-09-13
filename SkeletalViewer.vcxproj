@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClCompile Include="DrawDevice.cpp" />
     <ClCompile Include="NuiImpl.cpp" />
+    <ClCompile Include="ShapeLibrary.cpp" />
     <ClCompile Include="SkeletalViewer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

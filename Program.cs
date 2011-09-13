@@ -43,7 +43,7 @@ namespace BodyTetrisWrapper
 
         static int numPhotos = 0;
 
-        public static int TweetPicture(int shape, int orientation,int w, int h, IntPtr ptr)
+        public static int TweetPicture(int shape, int orientation, int w, int h, IntPtr ptr)
         {
             try
             {
@@ -70,7 +70,6 @@ namespace BodyTetrisWrapper
                 string TweetString = Tetronimos.GetString(shape, orientation);
                 string TweetFileName = "" + TweetString + " " + numPhotos + ".png";
 
-
                 FileStream stream = new FileStream(TweetFileName, FileMode.Create);
                 PngBitmapEncoder encoder = new PngBitmapEncoder();
 
@@ -82,8 +81,7 @@ namespace BodyTetrisWrapper
 
                 //TODO upload tweet photo.
 
-
-                twitter.UploadPhoto(pixels, TweetString, TweetFileName);
+                //HACK twitter.UploadPhoto(pixels, TweetString, TweetFileName);
             }
             catch (Exception e)
             {

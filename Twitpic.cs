@@ -77,6 +77,8 @@ namespace BodyTetrisWrapper
         /// <returns>Return true, if the operation was succeded.</returns>
         public bool UploadPhoto(byte[] binaryImageData, string tweetMessage, string filename)
         {
+            //TODO: currently uploads as video (mp4)...should upload as image.
+
             // Documentation: http://www.twitpic.com/api.do
             string boundary = Guid.NewGuid().ToString();
             string requestUrl = String.IsNullOrEmpty(tweetMessage) ? TWITPIC_UPLADO_API_URL : TWITPIC_UPLOAD_AND_POST_API_URL;

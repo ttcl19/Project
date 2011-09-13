@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "SkeletalViewer.h"
+
 #include "resource.h"
 #include <mmsystem.h>
 
@@ -555,7 +556,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 				//the if statements here basically checks if there exists a number(an 
 				//indicator for the colour the box needs to be coloured in) and colours
 				//them appropriately
-				//m_selectedsahpe points to an array containing the bitmap of the desire of 
+				//m_selectedshape points to an array containing the bitmap of the desire of 
 				//the desired shape with 0,1 and 2. etc. 
 				if (m_selectedShape == NULL || 
 					m_selectedShape[i] == 0) {
@@ -589,25 +590,27 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( )
 
 			if (ShapeIndex > 0) {
 
-				if (p1Passed && p2Passed) {
-					bool chooseP1 = (rand() % 2 == 0);
-					p1Passed = chooseP1;
-					p2Passed = !chooseP1;
+				if (p1Passed || p2Passed)
+				{
+					if (p1Passed && p2Passed) {
+						bool chooseP1 = (rand() % 2 == 0);
+						p1Passed = chooseP1;
+						p2Passed = !chooseP1;
+					}
+
+					int pPassedNum = p1Passed ? 1 : 2;
+
+					TwitterPost(ShapeIndex, ori, Shapes::X1(ShapeIndex,ori,pPassedNum)*m_boxWidth, 
+						Shapes::Y1(ShapeIndex,ori,pPassedNum)*m_boxHeight, 
+						Shapes::X2(ShapeIndex,ori,pPassedNum)*m_boxWidth,
+						Shapes::Y2(ShapeIndex,ori,pPassedNum)*m_boxHeight);
+
+					//image captured - hide shape.
+
+					//TODO "flash" effect or something awesome.
+					m_timeLimit = 0; //HACK This is hacky and doesn't feel right - Dustin
+
 				}
-
-				if (p1Passed) {
-					// capture image and send it over
-					// twitter post 
-				
-					TwitterPost(ShapeIndex, ori, 0, 0, m_boxWidth/2,m_boxHeight);
-
-
-				} else if (p2Passed) {
-					// same as above
-
-					TwitterPost(ShapeIndex, ori, m_boxWidth/2, 0, m_boxWidth, m_boxHeight); 
-				}
-
 			}
 
 			 //picture-in-picture

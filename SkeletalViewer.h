@@ -12,9 +12,12 @@
 
 #pragma once
 
+#include "ShapeLibrary.h"
+
 #include "resource.h"
 #include "MSR_NuiApi.h"
 #include "DrawDevice.h"
+
 
 #define SZ_APPDLG_WINDOW_CLASS        _T("SkeletalViewerAppDlgWndClass")
 
@@ -89,7 +92,7 @@ private:
 
 	//for TwitterPost use 
 	int			  ShapeIndex;
-	int			  ori; 
+	int			  ori;   //What is this? Dustin
 
 
 	ULONGLONG	  m_timeLimit;

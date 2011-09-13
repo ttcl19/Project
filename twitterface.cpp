@@ -8,7 +8,7 @@ int CSkeletalViewerApp::TwitterPost(int shape, int orientation, int X1, int Y1, 
 	int w = X2 - X1;
 	int h = Y2 - Y1;
 	
-	printf("TwitterPost shape: %i\n", shape);
+	printf("TwitterPost shape: %i X1: %i Y1: %i X2: %i Y2: %i\n", shape, X1, Y1, X2, Y2);
 
 	unsigned char * imageBits =  (unsigned char*)globalAlloc(w*h*3);
 	

@@ -1,141 +1,56 @@
+#pragma once
+
+#ifndef SHAPES
+#define SHAPES
+
 namespace Shapes {
-	int I[][24] = {
-		{0, 1, 0, 0, 2, 0,
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0},
 
-		/*{0, 0, 1, 2, 0, 0,
-		 0, 0, 1, 2, 0, 0, 
-		 0, 0, 1, 2, 0, 0, 
-		 0, 0, 1, 2, 0, 0}*/
-	};
+	extern int I[][24];
 
-	int J[][24] = {
-		{0, 0, 0, 0, 0, 0,
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0, 
-		 1, 1, 0, 2, 2, 0},
+	extern int J[][24];
 
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 1, 1, 2, 2, 2, 
-		 0, 0, 1, 0, 0, 2},
+	extern int L[][24];
 
-		{0, 0, 0, 0, 0, 0,
-		 0, 1, 1, 0, 2, 2, 
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0},
+	extern int O[][24];
 
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 0, 0, 2, 0, 0, 
-		 1, 1, 1, 2, 2, 2}
-	};
+	extern int Z[][24];
 
-	int L[][24] = {
-		{0, 0, 0, 0, 0, 0,
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 1, 0, 2, 2},
+	extern int T[][24];
 
-		 {0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 0, 0, 1, 0, 0, 2, 
-		 1, 1, 1, 2, 2, 2},
-
-		{0, 0, 0, 0, 0, 0,
-		 1, 1, 0, 2, 2, 0, 
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 0, 0, 2, 0},
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 1, 1, 2, 2, 2, 
-		 1, 0, 0, 2, 0, 0},
-
-	};
-
-	int O[][24] = {
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 1, 0, 2, 2, 0, 
-		 1, 1, 0, 2, 2, 0},
-
-		/*{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 0, 1, 1, 0, 2, 2, 
-		 0, 1, 1, 0, 2, 2}*/
-	};
-
-	int Z[][24] = {
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 1, 0, 2, 2, 0, 
-		 0, 1, 1, 0, 2, 2},
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 1, 0, 0, 2, 
-		 0, 1, 1, 0, 2, 2, 
-		 0, 1, 0, 0, 2, 0},
-		
-		/*{0, 0, 0, 0, 0, 0,
-		 0, 1, 0, 0, 2, 0, 
-		 1, 1, 0, 2, 2, 0, 
-		 1, 0, 0, 2, 0, 0}*/
-	};
-
-	int T[][24] = {
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 1, 1, 1, 2, 2, 2, 
-		 0, 1, 0, 0, 2, 0},
-
-		{0, 0, 0, 0, 0, 0,
-		 1, 0, 0, 2, 0, 0, 
-		 1, 1, 0, 2, 2, 0,
-		 1, 0, 0, 2, 0, 0},
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 0, 1, 0, 0, 2, 0, 
-		 1, 1, 1, 2, 2, 2},
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 1, 0, 0, 2, 
-		 0, 1, 1, 0, 2, 2, 
-		 0, 0, 1, 0, 0, 2},
-		
-
-
-	};
-
-	int S[][24] = {
-		{0, 0, 0, 0, 0, 0,
-		 0, 0, 0, 0, 0, 0, 
-		 0, 1, 1, 0, 2, 2, 
-		 1, 1, 0, 2, 2, 0},
-
-		{0, 0, 0, 0, 0, 0,
-		 0, 1, 0, 0, 2, 0, 
-		 0, 1, 1, 0, 2, 2, 
-		 0, 0, 1, 0, 0, 2},
-		/*
-		{0, 0, 0, 0, 0, 0,
-		 1, 0, 0, 2, 0, 0, 
-		 1, 1, 0, 2, 2, 0, 
-		 0, 1, 0, 0, 2, 0}*/
-	};
+	extern int S[][24];
 
 	//An array containing the number of elements in each of the above respective arrays 
-	int ori[] = {
-		sizeof(I) / sizeof(I[0]),
-		sizeof(J) / sizeof(J[0]),
-		sizeof(L) / sizeof(L[0]),
-		sizeof(O) / sizeof(O[0]),
-		sizeof(Z) / sizeof(Z[0]),
-		sizeof(T) / sizeof(T[0]),
-		sizeof(S) / sizeof(S[0])
-	};
+	extern int ori[];
+
+	//holds all the integer-valued bounds on objects
+	extern int bounds[7][4][2][4];;
+
+	inline int boundsIndex(int ShapeIndex, int ori, int player, int bound)
+	{
+		//used by the X1, Y1, X2, Y2 functions to return the integer-valued bound.
+		//bound: X1 - 0, Y1 - 1, X2 - 2, Y2 - 3
+
+		return bounds[ShapeIndex - 1][ori][player - 1][bound];
+
+	}
+
+	//Functions that return the suitable integer of X1,Y1,X2,Y2 for taking pictures.
+	inline int X1(int ShapeIndex, int ori, int player)
+	{
+		return boundsIndex(ShapeIndex,ori,player,0);
+	}
+	inline int Y1(int ShapeIndex, int ori, int player)
+	{
+		return boundsIndex(ShapeIndex,ori,player,1);
+	}
+	inline int X2(int ShapeIndex, int ori, int player)
+	{
+		return boundsIndex(ShapeIndex,ori,player,2);
+	}
+	inline int Y2(int ShapeIndex, int ori, int player)
+	{
+		return boundsIndex(ShapeIndex,ori,player,3);
+	}
 }
+
+#endif

@@ -11,6 +11,9 @@ namespace BodyTetrisWrapper
 {
     class Program
     {
+        //HACK TWEETING_ENABLED
+        const bool TWEETING_ENABLED = false;
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int IntFunc(int i);
 
@@ -40,8 +43,38 @@ namespace BodyTetrisWrapper
         }
 
         static Twitpic twitter = new Twitpic("TweetrisTO","squiggle");
+        static Twitpic twittershh = new Twitpic("TweetrisTOshh", "squiggle");
 
         static int numPhotos = 0;
+
+        public static int SavePNG(byte[] pixels, int w, int h, string Filename)
+        {
+            // Define the image palette
+            BitmapPalette myPalette = BitmapPalettes.Halftone256;
+
+            // Creates a new empty image with the pre-defined palette
+
+            BitmapSource image = BitmapSource.Create(
+                w,
+                h,
+                96,
+                96,
+                PixelFormats.Rgb24,
+                myPalette,
+                pixels,
+                w * 3);
+
+            FileStream stream = new FileStream(Filename, FileMode.Create);
+            PngBitmapEncoder encoder = new PngBitmapEncoder();
+
+            encoder.Interlace = PngInterlaceOption.On;
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            encoder.Save(stream);
+
+            stream.Close();
+
+            return 0;
+        }
 
         public static int TweetPicture(int shape, int orientation, int w, int h, IntPtr ptr)
         {
@@ -52,51 +85,50 @@ namespace BodyTetrisWrapper
                 byte[] pixels = new byte[w * h * 3];
                 Marshal.Copy(ptr, pixels, 0, w * h * 3);
 
-                BlackOut(pixels,shape,orientation,w,h);
-
-                // Define the image palette
-                BitmapPalette myPalette = BitmapPalettes.Halftone256;
-
-                // Creates a new empty image with the pre-defined palette
-
-                BitmapSource image = BitmapSource.Create(
-                    w,
-                    h,
-                    96,
-                    96,
-                    PixelFormats.Rgb24,
-                    myPalette,
-                    pixels,
-                    w*3);
+                ImageUtils.BlackOut(pixels,shape,orientation,w,h);
 
                 string TweetString = Tetronimos.GetString(shape, orientation);
                 string TweetFileName = "" + TweetString + " " + numPhotos + ".png";
 
-                FileStream stream = new FileStream(TweetFileName, FileMode.Create);
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                SavePNG(pixels, w, h, TweetFileName);
 
-                encoder.Interlace = PngInterlaceOption.On;
-                encoder.Frames.Add(BitmapFrame.Create(image));
-                encoder.Save(stream);
+                if (TWEETING_ENABLED)
+                    twitter.UploadPhoto(pixels, TweetString, TweetFileName);
 
-                stream.Close();
+                string TweetShhString = "BLOCK," + numPhotos + "," + shape + "," + orientation + ",";
 
-                //TODO upload tweet photo.
+                byte[] block1, block2, block3, block4;
 
-                //HACK twitter.UploadPhoto(pixels, TweetString, TweetFileName);
-            
+                switch (shape)
+                {
+                    case 1:
+                        block1 = ImageUtils.ImageSubset(pixels, w, h, 0, 0, w, h * 1 / 4);
+                        block2 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 1 / 4, w, h * 2 / 4);
+                        block3 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 2 / 4, w, h * 3 / 4);
+                        block4 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 3 / 4, w, h);
+
+                        SavePNG(block1, w, w, TweetShhString + "1" + ".png");
+                        SavePNG(block2, w, w, TweetShhString + "2" + ".png");
+                        SavePNG(block3, w, w, TweetShhString + "3" + ".png");
+                        SavePNG(block4, w, w, TweetShhString + "4" + ".png");
+
+                        //twittershh.UploadPhoto(block1,TweetShhString + "1",TweetShhString + "1"+".png");
+                        //twittershh.UploadPhoto(block2,TweetShhString + "2",TweetShhString + "2"+".png");
+                        //twittershh.UploadPhoto(block3,TweetShhString + "3",TweetShhString + "3"+".png");
+                        //twittershh.UploadPhoto(block4,TweetShhString + "4",TweetShhString + "4"+".png");
+
+                        break;
+                }
                 //TODO send and cut up mini-photos.
-            
             
             }
             catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
             numPhotos++;
             return 0;
         }
-
 
         static void Main(string[] args)
         {
@@ -107,14 +139,10 @@ namespace BodyTetrisWrapper
             Action KinectLoop = new Action(openKinectWindow);
             KinectLoop.BeginInvoke(null, null);
 
-            
-
-
-            //TODO provide callback for image writing.
-
-            Console.WriteLine("Everything open; begin idlin'");
-
             bool run = true;
+
+            Console.WriteLine("Type -1 and press ENTER to start game.");
+
             while (run)
             {
                 string input = Console.ReadLine();
@@ -134,25 +162,6 @@ namespace BodyTetrisWrapper
 
         }
 
-        static void BlackOut(byte[] pixels, int shape, int orientation, int w, int h)
-        {
-            //Blacks out the pixels that aren't part of the shape.
-
-            for (int y = 0; y < h; y++)
-            {
-                for (int x = 0; x < w; x++)
-                {
-                    if (!Tetronimos.IsIn(shape, orientation, x, y, w, h))
-                    {
-                        //blacken pixel
-                        int index = x + y*w;
-
-                        pixels[3 * index] = 0;
-                        pixels[3 * index + 1] = 0;
-                        pixels[3 * index + 2] = 0;
-                    }
-                }
-            }
-        }
+        
     }
 }

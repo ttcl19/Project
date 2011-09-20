@@ -1,16 +1,21 @@
+(mostly for Dustin to keep track of his work - careful editing)
 
-Upload as new shape format:
-- C# sends full shape tweetristo
-  - must black out irrelevant areas
+Send OSC format commands for Kyle's sound work. Using Kinect To Max as sample - uses Ventuz
+- according to Kyle's message format.
 
-Sent images seem to be universally too high up.
+
+TODO: find out canonical rotations/negotiate from Derek.
 
 - C# cuts shape up into sub-shape squares:
+  - sub-shape squares not working exactly. Either error in ImageSubset, or save file.
+
   - posts each to TweetrisTOshh (password: squiggle), according to derek's format
+
+
 
 
 Twitpic detecting as video...why?
 
-Incorporate Kinect To Max project (OSC to Max/MSP) into main project according to Kyle's message format.
-
 Have debug vs real window configuration.
+
+P1 and P2 are restricted to left and right shapes; Fix this.

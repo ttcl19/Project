@@ -61,3 +61,16 @@ I don't think we need to hold the game up on either side when a request is place
 let me know how this sounds to both of you
 
 Derek
+
+
+Just confirming on the hidden, ugly tweet format:
+
+
+"BLOCK", BLOCK_ID, BLOCK_TYPE, ORIGINAL_ORIENTATION, ROW, COL, IMG_URL
+
+
+BLOCK_ID: an increment that identifies the block "to which this tweet refers" 
+BLOCK_TYPE: "TEE", "REL", "LEL", etc. or better names as determined
+ROW: 0-3
+COL: 0-1 (or reverse this for 0-1 row, 0-3 col, depending on what the "canonical" orientation of each tetromino will be)
+IMG_URL: the twitPic URL for the image (? am I correct in assuming this will be a URL? ) 

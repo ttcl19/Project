@@ -1,0 +1,26 @@
+
+-      People enter/leave
+	o  Two people enter = game start
+
+ 
+-      Round Start
+	o  When two people enter OR next shape.
+
+-      Game Clock, eg. how much time is counting down
+	o  Send message at round start. Send game round duration?
+
+ 
+-      Time out – game round end failure
+
+ 
+-      Shape completed (win)
+	o  Which user
+
+ 
+-      In square that user is meant to be in
+
+	o  Two arrays of occupancy (e.g. 5 x 6)
+
+		§  Goals: [000110110000222000222]
+
+		§  Current: [0000111000022222000]

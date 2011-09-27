@@ -30,7 +30,7 @@ namespace BodyTetrisWrapper
         public delegate int PtrPassFunc(IntPtr ptr);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int TweetFunc(int i1, int i2, int w, int h, IntPtr ptr);
+        public delegate int TweetFunc(int i1, int i2, int w, int h, int squareSize, IntPtr ptr);
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void openKinectWindow();
@@ -82,16 +82,17 @@ namespace BodyTetrisWrapper
             return 0;
         }
 
-        public static int TweetPicture(int shape, int orientation, int w, int h, IntPtr ptr)
+        public static int TweetPicture(int shape, int ori, int w, int h, int squareSize, IntPtr ptr)
         {
             try
             {
                 //ptr is the pointer to the photo bits.
-
                 byte[] pixels = new byte[w * h * 3];
                 Marshal.Copy(ptr, pixels, 0, w * h * 3);
 
-                ImageUtils.BlackOut(pixels,shape,orientation,w,h);
+                ImageUtils.BlackOut(pixels,shape,ori,w,h);
+
+                int orientation = Tetronimos.OrientationConversion(shape, ori);
 
                 string TweetString = Tetronimos.GetString(shape, orientation);
                 string TweetFileName = "" + TweetString + " " + numPhotos + ".png";
@@ -101,38 +102,157 @@ namespace BodyTetrisWrapper
                 if (TWEETING_ENABLED)
                     twitter.UploadPhoto(pixels, TweetString, TweetFileName);
 
-                string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + orientation + ",";
+                string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + ori + ",";
 
-                byte[] block1, block2, block3, block4;
+                byte[][] blocks = new byte[4][];
 
                 switch (shape)
                 {
                     case 1: //LINE
-                        block1 = ImageUtils.ImageSubset(pixels, w, h, 0, 0, w, h * 1 / 4);
-                        block2 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 1 / 4, w, h * 2 / 4);
-                        block3 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 2 / 4, w, h * 3 / 4);
-                        block4 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 3 / 4, w, h);
+                        blocks[0] = ImageUtils.ImageSubset(pixels, w, h, 0, 0, w, h * 1 / 4);
+                        blocks[1] = ImageUtils.ImageSubset(pixels, w, h, 0, h * 1 / 4, w, h * 2 / 4);
+                        blocks[2] = ImageUtils.ImageSubset(pixels, w, h, 0, h * 2 / 4, w, h * 3 / 4);
+                        blocks[3] = ImageUtils.ImageSubset(pixels, w, h, 0, h * 3 / 4, w, h);
 
-                        SavePNG(block1, w, w, TweetShhString + "1" + ".png");
-                        SavePNG(block2, w, w, TweetShhString + "2" + ".png");
-                        SavePNG(block3, w, w, TweetShhString + "3" + ".png");
-                        SavePNG(block4, w, w, TweetShhString + "4" + ".png");
-
-                        if (TWEETING_ENABLED)
+                        for (int i = 0; i < 4; i++)
                         {
-                            twittershh.UploadPhoto(block1, TweetShhString + "1", TweetShhString + "1" + ".png");
-                            twittershh.UploadPhoto(block2, TweetShhString + "2", TweetShhString + "2" + ".png");
-                            twittershh.UploadPhoto(block3, TweetShhString + "3", TweetShhString + "3" + ".png");
-                            twittershh.UploadPhoto(block4, TweetShhString + "4", TweetShhString + "4" + ".png");
+                            SavePNG(blocks[i], w, w, TweetShhString + (i+1) + ".png");
+                            if (TWEETING_ENABLED)
+                            {
+                                twittershh.UploadPhoto(blocks[i], TweetShhString + (i + 1), TweetShhString + (i + 1) + ".png");
+                            }
+                        }
+                        break;
+                    case 2: //LEL
+                        switch (orientation)
+                        {
+                            case 0:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                break;
+                            case 90:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 2);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 2);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                break;
+                            case 180:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 0);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                break;
+                            case 270:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 2);
+                                break;
                         }
 
+                        for (int i = 0; i < 4; i++)
+                        {
+                            blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
+                        }
+                        //ROW,COL
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ".png");
+
+                        //TODO LEL
                         break;
-                    case 2: //REL
+                    case 3: //REL
+                        switch (orientation)
+                        {
+                            case 0:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 0);
+                                break;
+                            case 90:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 2);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 2);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                break;
+                            case 180:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 0);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                break;
+                            case 270:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 2);
+                                break;
+                        }
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
+                        }
+                        //ROW,COL
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        
+                        break;
+                    case 4: //SQUARE
+                        blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                        blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                        blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                        blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        break;
+
+                    case 5: // Z/RESS
+                        switch (orientation)
+                        {
+                            case 0:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                break;
+                            case 180:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 2);
+                                break;
+                        }
+                        for (int i = 0; i < 4; i++)
+                        {
+                            blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
+                        }
+                        //ROW,COL
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
 
                         break;
 
+                    //TODO send and cut up mini-photos.
+                    case 6: //TEE
+
+                        break;
+                    case 7: // S/LESS
+
+                        break;
                 }
-                //TODO send and cut up mini-photos.
+                
             
             }
             catch (Exception e)

@@ -69,8 +69,32 @@ namespace BodyTetrisWrapper
             return "";
         }
 
+        public static int OrientationConversion(int shape, int ori)
+        {
+            //converts from C++ format to C# format.
+            switch(shape)
+            {
+                case 1:
+                    return 0;
+                case 2:
+                    return ori * 90;
+                case 3:
+                    return ori * 90;
+                case 4:
+                    return 0;
+                case 5:
+                    return ori * 90;
+                case 6:
+                    return ori * 90;
+                case 7:
+                    return ori * 90;
+            }
+            return 0;
+        }
+
         public static bool IsIn(int shape, int orientation, int x, int y, int w, int h)
         {
+
             //Returns true if the pixel is "in" the tetronimo, and should be coloured in.
 
             double x_frac = x / (double)w;
@@ -91,21 +115,22 @@ namespace BodyTetrisWrapper
                     switch (orientation)
                     {
                         case 0:
-                            if (x_frac >= 0.5 || y_frac >= 2.0/3.0)
-                                return true;
-                            break;
-                        case 1:
-                            if (y_frac <= 0.5 || x_frac >= 2.0 / 3.0)
-                                return true;
-                            break;
-                        case 2:
-                            if (x_frac <= 0.5 || y_frac <= 1.0 / 3.0)
-                                return true;
-                            break;
-                        case 3:
                             if (y_frac >= 0.5 || x_frac <= 1.0 / 3.0)
                                 return true;
                             break;
+                        case 1:
+                            if (x_frac >= 0.5 || y_frac >= 2.0/3.0)
+                                return true;
+                            break;
+                        case 2:
+                            if (y_frac <= 0.5 || x_frac >= 2.0 / 3.0)
+                                return true;
+                            break;
+                        case 3:
+                            if (x_frac <= 0.5 || y_frac <= 1.0 / 3.0)
+                                return true;
+                            break;
+                        
                     }
 
                     break;
@@ -113,23 +138,22 @@ namespace BodyTetrisWrapper
                     switch (orientation)
                     {
                         case 0:
-                            if (x_frac <= 0.5 || y_frac >= 2.0/3.0)
-                                return true;
-                            break;
-                        case 1:
-                            if (y_frac >= 0.5 || x_frac >= 2.0 / 3.0)
-                                return true;
-                            break;
-                        case 2:
-                            if (x_frac >= 0.5 || y_frac <= 1.0 / 3.0)
-                                return true;
-                            break;
-                        case 3:
                             if (y_frac <= 0.5 || x_frac <= 1.0 / 3.0)
                                 return true;
                             break;
+                        case 1:
+                            if (x_frac <= 0.5 || y_frac >= 2.0/3.0)
+                                return true;
+                            break;
+                        case 2:
+                            if (y_frac >= 0.5 || x_frac >= 2.0 / 3.0)
+                                return true;
+                            break;
+                        case 3:
+                            if (x_frac >= 0.5 || y_frac <= 1.0 / 3.0)
+                                return true;
+                            break;
                     }
-
                     break;
                 case 4: //O
                     //orientation doesn't make a diff.

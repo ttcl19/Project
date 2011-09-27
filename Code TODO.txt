@@ -2,7 +2,6 @@
 
 
 TODO: 
-- make Derek's canonical orientation the default orientation in c++, with following orientations in CCW order.
 
 
 - implement shape tweeting for every shape.

@@ -46,7 +46,7 @@ public:
 
 	void					KeyboardInput(WPARAM keyCode);
 	void					CapturePicture();
-	int						(*TweetPicture)(int shape, int orientation,int w, int h,void* ptr);
+	int						(*TweetPicture)(int shape, int orientation,int w, int h, int squareSize, void* ptr);
     void*					(*globalAlloc)(int size);
 
 	int						TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);

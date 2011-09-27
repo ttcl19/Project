@@ -7,9 +7,20 @@ namespace BodyTetrisWrapper
 {
     static class ImageUtils
     {
+        public static byte[] ImageGetSquare(byte[] pixels, int w, int h, int squareSize, int X, int Y)
+        {
+            //grabs square starting at the upper left corner
+            return ImageSubset(pixels, w, h, X * squareSize, Y * squareSize, (X + 1) * squareSize, (Y + 1) * squareSize);
+        }
+
+        public static byte[] ImageSubsetUnit(byte[] pixels, int w, int h, int squareSize, int X1, int Y1, int X2, int Y2)
+        {
+            return ImageSubset(pixels, w, h, X1 * squareSize, Y1 * squareSize, X2 * squareSize, Y2 * squareSize);
+        }
+        
         public static byte[] ImageSubset(byte[] pixels, int w, int h, int X1, int Y1, int X2, int Y2)
         {
-
+            //w,h are size of whole image, X1,Y1,X2,Y2 are the subset
             byte[] newPixels = new byte[3*(X2-X1)*(Y2-Y1)];
 
             int oldIndex = 0;
@@ -32,6 +43,11 @@ namespace BodyTetrisWrapper
             }
             
             return newPixels;
+        }
+
+        public static byte[] RotateImage90s(byte[] pixels, int w, int h, int rotation)
+        {
+            return RotateImage(pixels, w, h, rotation / 90);
         }
 
         public static byte[] RotateImage(byte[] pixels, int w, int h, int rotation)

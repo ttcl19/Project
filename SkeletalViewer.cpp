@@ -32,7 +32,7 @@ HWND				g_hWndApp;				// Windows Handle to main application
 TCHAR				g_szAppTitle[256];		// Application title
 
 extern "C" _declspec(dllexport) void openKinectWindow();
-extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, void* ptr));
+extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr));
 
 extern "C" _declspec(dllexport) int numericCommand(int cmd);
 
@@ -222,7 +222,7 @@ return (nRet);
 	return (FALSE);
 }
 
-int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation,int w, int h,void* ptr))
+int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation,int w, int h, int squareSize, void* ptr))
 {
 	g_CSkeletalViewerApp.globalAlloc = globalAlloc;
 	g_CSkeletalViewerApp.TweetPicture = TweetPicture;

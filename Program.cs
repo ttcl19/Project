@@ -162,7 +162,6 @@ namespace BodyTetrisWrapper
                         SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
                         SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ".png");
 
-                        //TODO LEL
                         break;
                     case 3: //REL
                         switch (orientation)
@@ -244,12 +243,70 @@ namespace BodyTetrisWrapper
 
                         break;
 
-                    //TODO send and cut up mini-photos.
                     case 6: //TEE
+                        switch (orientation)
+                        {
+                            case 0:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 0);
+                                break;
+                            case 90:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 2);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                break;
+                            case 180:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                break;
+                            case 270:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 2);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                break;
+                        }
 
+                        for (int i = 0; i < 4; i++)
+                        {
+                            blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
+                        }
+                        //ROW,COL
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
                         break;
                     case 7: // S/LESS
-
+                        switch (orientation)
+                        {
+                            case 0:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 0);
+                                break;
+                            case 180:
+                                blocks[0] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 2, 1);
+                                blocks[1] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
+                                blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 1);
+                                blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 0, 0);
+                                break;
+                        }
+                        for (int i = 0; i < 4; i++)
+                        {
+                            blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
+                        }
+                        //ROW,COL
+                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
                         break;
                 }
                 

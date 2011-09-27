@@ -12,10 +12,8 @@ TODO: find out canonical rotations/negotiate from Derek.
   - posts each to TweetrisTOshh (password: squiggle), according to derek's format
 
 
+1) Bugfix: "Player 1" can only win by making the shape on the left. "Player 2" can only win by making the shape on the right. This shouldn't matter, as players won't come in conveniently in the right order. The bugfix should ensure that the boxes are coloured correctly, and p1Passed and p2Passed will be the correct values.
 
+2) Window needs to only show VGA View, be 1024x768. Right now the window has a bunch of other crap (Skeletal View, Depth View, framerate, etc.) This needs to be cleaned up to only show the VGA View (meaning the RGB feedback, with the tetris boxes draw on top of it). This should only be "commented out", or something so it's easy to get everything back for debugging.
 
-Twitpic detecting as video...why?
-
-Have debug vs real window configuration.
-
-P1 and P2 are restricted to left and right shapes; Fix this.
+3) Right now, when you cross the threshold required to make the shape, it takes the picture instantly. This makes for pictures where you're just coming in to the position, which won't look that good when they're uploaded to the tetris stream. Make it so that a picture is only taken after n frames. I think making n about 15 now is good. There should be some visual indication (a little progress bar?) that shows that it is counting down the n frames. To avoid breaking existing functionality, p1Passed or p2Passed should only become true when the picture is to be taken. 

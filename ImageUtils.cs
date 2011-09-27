@@ -48,9 +48,10 @@ namespace BodyTetrisWrapper
                     //simply reverse direction
                     for (int i = 0; i < w * h; i++)
                     {
-                        newPixels[3 * i] = pixels[3 * (w * h - i)];
-                        newPixels[3 * i + 1] = pixels[3 * (w * h - i) + 1];
-                        newPixels[3 * i + 2] = pixels[3 * (w * h - i) + 2];
+                        int newIndex = w * h - 1 - i;
+                        newPixels[3 * i] = pixels[3 * newIndex];
+                        newPixels[3 * i + 1] = pixels[3 * newIndex + 1];
+                        newPixels[3 * i + 2] = pixels[3 * newIndex + 2];
                     }
                     return newPixels;
                 case 1:
@@ -63,13 +64,16 @@ namespace BodyTetrisWrapper
                     }
                     return newPixels;
                 case 3:
-                    for (int i = 0; i < w * h; i++)
-                    {
-                        int newIndex = (w * (h - 1) + 1 + i/w) - h * (i % w);
-                        newPixels[3 * newIndex] = pixels[3 * i];
-                        newPixels[3 * newIndex + 1] = pixels[3 * i + 1];
-                        newPixels[3 * newIndex + 2] = pixels[3 * i + 2];
-                    }
+                    //the below makes me a terrible person.
+                    newPixels = RotateImage(pixels,w, h, 2);
+                    newPixels = RotateImage(newPixels,w, h, 1);
+                    //for (int i = 0; i < w * h; i++)
+                    //{
+                    //    int newIndex = (w * (h - 1) + 1 + i/w) - h * (i % w);
+                    //    newPixels[3 * newIndex] = pixels[3 * i];
+                    //    newPixels[3 * newIndex + 1] = pixels[3 * i + 1];
+                    //    newPixels[3 * newIndex + 2] = pixels[3 * i + 2];
+                    //}
                     return newPixels;
             }
 

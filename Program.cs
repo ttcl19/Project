@@ -101,13 +101,13 @@ namespace BodyTetrisWrapper
                 if (TWEETING_ENABLED)
                     twitter.UploadPhoto(pixels, TweetString, TweetFileName);
 
-                string TweetShhString = "BLOCK," + numPhotos + "," + shape + "," + orientation + ",";
+                string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + orientation + ",";
 
                 byte[] block1, block2, block3, block4;
 
                 switch (shape)
                 {
-                    case 1:
+                    case 1: //LINE
                         block1 = ImageUtils.ImageSubset(pixels, w, h, 0, 0, w, h * 1 / 4);
                         block2 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 1 / 4, w, h * 2 / 4);
                         block3 = ImageUtils.ImageSubset(pixels, w, h, 0, h * 2 / 4, w, h * 3 / 4);
@@ -127,6 +127,10 @@ namespace BodyTetrisWrapper
                         }
 
                         break;
+                    case 2: //REL
+
+                        break;
+
                 }
                 //TODO send and cut up mini-photos.
             
@@ -179,7 +183,7 @@ namespace BodyTetrisWrapper
                     int number = Convert.ToInt32(input);
                     numericCommand(number);
 
-                    //HACK
+                    //HACK OSC
                     OscBundle bundle = new OscBundle();
                     OscElement message = new OscElement("/I/am/sending/you/five", 5);
 

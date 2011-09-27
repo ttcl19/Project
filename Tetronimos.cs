@@ -15,38 +15,58 @@ namespace BodyTetrisWrapper
             string msg = "";
             switch(shape)
             {
-                case 0:
+                case 1:
                     msg += "drill";
                     msg += " " + orientation;
                     break;
-                case 1:
+                case 2:
                     msg += "knight";
                     msg += " " + orientation;
                     break;
-                case 2:
+                case 3:
                     msg += "anti-knight";
                     msg += " " + orientation;
                     break;
-                case 3:
+                case 4:
                     msg += "box";
                     break;
-                case 4:
+                case 5:
                     msg += "lightning";
                     msg += " " + orientation;
                     break;
-                case 5:
+                case 6:
                     msg += "hat";
                     msg += " " + orientation;
                     break;
-                case 6:
+                case 7:
                     msg += "anti-lightning";
                     msg += " " + orientation;
                     break;
 
             }
-
-
             return "shape";
+        }
+
+        public static string GetShhName(int shape )
+        {
+            switch (shape)
+            {
+                case 1:
+                    return "LINE";
+                case 2:
+                    return "REL";
+                case 3:
+                    return "LEL";
+                case 4:
+                    return "SQUARE";
+                case 5:
+                    return "LESS";
+                case 6:
+                    return "TEE";
+                case 7:
+                    return "RESS";
+            }
+            return "";
         }
 
         public static bool IsIn(int shape, int orientation, int x, int y, int w, int h)

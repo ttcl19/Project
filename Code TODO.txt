@@ -1,22 +1,19 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
+
+TODO: 
+- make Derek's canonical orientation the default orientation in c++, with following orientations in CCW order.
+
+
+- implement shape tweeting for every shape.
+
+
+
+- Improve image quality
+
+
 Send OSC format commands for Kyle's sound work. Using Kinect To Max as sample - uses Ventuz
 - according to Kyle's message format.
-
-
-
-TODO: find out canonical rotations/negotiate from Derek.
-
-
-
-TODO: fix rotations
-- C# cuts shape up into sub-shape squares:
-  - sub-shape squares not working exactly. Either error in ImageSubset, or save file.
-
-  - posts each to TweetrisTOshh (password: squiggle), according to derek's format
-
-
-
 
 
 1) Bugfix: "Player 1" can only win by making the shape on the left. "Player 2" can only win by making the shape on the right. This shouldn't matter, as players won't come in conveniently in the right order. The bugfix should ensure that the boxes are coloured correctly, and p1Passed and p2Passed will be the correct values.

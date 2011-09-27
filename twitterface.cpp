@@ -26,7 +26,7 @@ int CSkeletalViewerApp::TwitterPost(int shape, int orientation, int X1, int Y1, 
 		}
 	}
 
-	TweetPicture( shape, orientation, w, h, (void*)imageBits);
+	TweetPicture( shape, orientation, w, h, (void*)imageBits); //to C#
 
 	return 0;
 }

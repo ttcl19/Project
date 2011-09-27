@@ -7,10 +7,16 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
+//for osc
+using Ventuz.OSC;
+
 namespace BodyTetrisWrapper
 {
     class Program
     {
+        static int OSC_PORT = 7710; //overridden by OSC_PORT.txt
+        static UdpWriter OSCSender; 
+
         //HACK TWEETING_ENABLED
         const bool TWEETING_ENABLED = false;
 
@@ -112,10 +118,13 @@ namespace BodyTetrisWrapper
                         SavePNG(block3, w, w, TweetShhString + "3" + ".png");
                         SavePNG(block4, w, w, TweetShhString + "4" + ".png");
 
-                        //twittershh.UploadPhoto(block1,TweetShhString + "1",TweetShhString + "1"+".png");
-                        //twittershh.UploadPhoto(block2,TweetShhString + "2",TweetShhString + "2"+".png");
-                        //twittershh.UploadPhoto(block3,TweetShhString + "3",TweetShhString + "3"+".png");
-                        //twittershh.UploadPhoto(block4,TweetShhString + "4",TweetShhString + "4"+".png");
+                        if (TWEETING_ENABLED)
+                        {
+                            twittershh.UploadPhoto(block1, TweetShhString + "1", TweetShhString + "1" + ".png");
+                            twittershh.UploadPhoto(block2, TweetShhString + "2", TweetShhString + "2" + ".png");
+                            twittershh.UploadPhoto(block3, TweetShhString + "3", TweetShhString + "3" + ".png");
+                            twittershh.UploadPhoto(block4, TweetShhString + "4", TweetShhString + "4" + ".png");
+                        }
 
                         break;
                 }
@@ -130,8 +139,27 @@ namespace BodyTetrisWrapper
             return 0;
         }
 
+        static void SetUpOSCPort()
+        {
+            //get OSC PORT
+            string OSC_PORT_FILE = "OSC_PORT.txt";
+            try
+            {
+                TextReader tr = new StreamReader(OSC_PORT_FILE);
+                OSC_PORT = Convert.ToInt32(tr.ReadLine());
+            }
+            catch
+            {
+                //do nothing.
+            }
+            
+            OSCSender = new UdpWriter("127.0.0.1", OSC_PORT);
+        }
+
         static void Main(string[] args)
         {
+            SetUpOSCPort();
+
             AllocFunc allocGlobalFunc = new AllocFunc(Program.allocGlobal);
             TweetFunc tweetbackFunc = new TweetFunc(Program.TweetPicture);
             int ret = setTweetback(allocGlobalFunc,tweetbackFunc);
@@ -142,7 +170,7 @@ namespace BodyTetrisWrapper
             bool run = true;
 
             Console.WriteLine("Type -1 and press ENTER to start game.");
-
+            
             while (run)
             {
                 string input = Console.ReadLine();
@@ -150,6 +178,18 @@ namespace BodyTetrisWrapper
                 {
                     int number = Convert.ToInt32(input);
                     numericCommand(number);
+
+                    //HACK
+                    OscBundle bundle = new OscBundle();
+                    OscElement message = new OscElement("/I/am/sending/you/five", 5);
+
+                    bundle.AddElement(message);
+                    
+                    
+                    //send bundle
+                    OSCSender.Send(bundle);
+
+
                 }
                 catch
                 {

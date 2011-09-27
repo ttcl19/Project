@@ -17,11 +17,13 @@ namespace BodyTetrisWrapper
             
             for (int y = Y1; y < Y2; y++)
             {
-                for (int x = X1; x < X2 + 1; x++)
+                for (int x = X1; x < X2; x++)
                 {
                     
-                    oldIndex = x + y * w;
-                    newIndex = (x - X1) + (y - Y1) * (X2 - X1);
+                    oldIndex = 3*(x + y * w);
+                    newIndex = 3*((x - X1) + (y - Y1) * (X2 - X1));
+                    //Console.WriteLine("x: " + x + " y: " + y + " old: " + oldIndex + " new: " + newIndex);
+                    
                     newPixels[newIndex] = pixels[oldIndex];
                     newPixels[newIndex + 1] = pixels[oldIndex + 1];
                     newPixels[newIndex + 2] = pixels[oldIndex + 2];

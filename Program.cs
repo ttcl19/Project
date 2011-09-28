@@ -434,7 +434,7 @@ namespace BodyTetrisWrapper
         }
         public static void ShapeStatus(int shape1, int shape2)
         {
-            Console.WriteLine("Got Shape Status");
+            //Console.WriteLine("Got Shape Status");
 
 
             OscBundle bundle = new OscBundle();

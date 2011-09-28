@@ -34,7 +34,7 @@ TCHAR				g_szAppTitle[256];		// Application title
 extern "C" _declspec(dllexport) void openKinectWindow();
 extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr));
 
-extern "C" _declspec(dllexport) int setOSCEvents(void (*GameStart)(),
+extern "C" _declspec(dllexport) int setOSCEvents(
 	void (*RoundStart)(), 
 	void (*Countdown)(int timeRemaining), 
 	void (*Timeout)(), 
@@ -242,7 +242,7 @@ int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, 
 	return 0;
 }
 
-int setOSCEvents(void (*GameStart)(),
+int setOSCEvents(
 	void (*RoundStart)(), 
 	void (*Countdown)(int timeRemaining), 
 	void (*Timeout)(), 

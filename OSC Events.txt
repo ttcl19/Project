@@ -15,7 +15,7 @@
  
 -      Shape completed (win)
 	o  Which user
-/pwins/<winning p number>
+ /pwins/<winning p number>
  
 -      Where users are - give every frame.
 /shape1/number

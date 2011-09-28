@@ -633,6 +633,38 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 		ULONGLONG diff = (ULONGLONG) ((1.0 / m_FramesTotal - 1.0 / 30) * 1000);
 		diff = 0;
 		m_videoDelay = GetTickCount64() + diff;
+
+		//HACK
+
+		ShapeCompleted(1);
+		ShapeCompleted(2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     else
     {

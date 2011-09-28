@@ -1,8 +1,10 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-1) Bugfix: "Player 1" can only win by making the shape on the left. "Player 2" can only win by making the shape on the right. This shouldn't matter, as players won't come in conveniently in the right order. The bugfix should ensure that the boxes are coloured correctly, and p1Passed and p2Passed will be the correct values.
-
 3) Right now, when you cross the threshold required to make the shape, it takes the picture instantly. This makes for pictures where you're just coming in to the position, which won't look that good when they're uploaded to the tetris stream. Make it so that a picture is only taken after n frames. I think making n about 15 now is good. There should be some visual indication (a little progress bar?) that shows that it is counting down the n frames. To avoid breaking existing functionality, p1Passed or p2Passed should only become true when the picture is to be taken. 
+
+draw horizontal progress bar across top, 3 squares wide.
+
+
 
 - Debug Kyle's OSC stuff
  - include /gamestart event.

@@ -37,6 +37,7 @@ public:
 
     void					drawBox(int boxIndex, RGBQUAD * color);
     void					drawBox(int boxIndex, RGBQUAD * color,double opacity);
+	void					drawRect(int X1, int X2, int Y1, int Y2, RGBQUAD * color, double opacity);
 	RGBQUAD                 Nui_ShortToQuad_Depth( USHORT s );
 
     static LONG CALLBACK    WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

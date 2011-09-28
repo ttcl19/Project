@@ -7,8 +7,8 @@
 - Debug Kyle's OSC stuff
  - include /gamestart event.
 
-- calibrate shape sizes.
+- calibrate shape sizes against background
 
-- Improve image quality
+- Improve image quality - will use desklamps
 
 

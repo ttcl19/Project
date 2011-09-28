@@ -359,6 +359,20 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
     NuiImageStreamReleaseFrame( m_pVideoStreamHandle, pImageFrame );
 }
 
+//Assigns the colours and effects of each respective case 
+RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
+RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
+RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
+RGBQUAD p1InWrongBox    = {0x47, 0xff, 0xff, 0x00};
+
+RGBQUAD p2Matched		= {0x32, 0xcd, 0x32, 0x00};//{0x82, 0xdd, 0xee, 0x00};
+RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
+RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
+RGBQUAD p2InWrongBox    = {0xeb, 0xce, 0xff, 0x00};
+
+RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
+//InWrongBox colours are for p2 is in p1's boxes, and vice versa.
+
 void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of the interaction happens.
 {
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
@@ -485,32 +499,20 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			//copy raw video to var for drawing effects (like tetris boxes) on top.
 			memcpy(m_videoEffects,m_videoCache,640*480*4);
 
-			//Assigns the colours and effects of each respective case 
-			RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
-			RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
-			RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
-			RGBQUAD p2Matched		= {0x82, 0xdd, 0xee, 0x00};
-			RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
-			RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
-			RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
-
-			//copy raw video to var for drawing effects (like tetris boxes) on top.
-			memcpy(m_videoEffects,m_videoCache,640*480*4);
-
 			//tetris box drawing
 			bool p1Passed = true, p2Passed = true;
+			int p1scoreCount = 0, p2scoreCount = 0;
 
 			int gap = 640 - m_boxWidth * m_numHBox;
 			int startX, startY;
 			UINT p1Score, p2Score;
 			UINT limit = 0.3 * m_boxHeight * m_boxWidth;
 
-			//m_numHBox was initialized to be 6 in Nui_init
+			//this loop iterates through each of the boxes in the Tetris grid, calculating scores and drawing.
 			for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
 				startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
 				startY = (i / m_numHBox) * m_boxHeight + y_box_offset;
 				pPlayerRun = m_playerMap + startY * 640 + startX;
-
 
 				//Calculates the scores 
 				p1Score = 0;
@@ -540,8 +542,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				//indicator for the colour the box needs to be coloured in) and colours
 				//them appropriately
 				//m_selectedshape points to an array containing the bitmap of the desire of 
-				//the desired shape with 0,1 and 2. etc. 
-				int p1scoreCount = 0, p2scoreCount = 0;
+				//the desired shape with 0, 1 and 2. etc. 
 				if (m_selectedShape == NULL || 
 					m_selectedShape[i] == 0) {
 					if (p1Score >= limit) {
@@ -556,7 +557,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				} else if (m_selectedShape[i] == 1) {
 					if (p1Score < limit) {
 						p1Passed = false;
-						drawBox(i, &p1Unmatched, 0.5);
+						if (p2Score> limit) {
+							drawBox(i, &p2InWrongBox, 0.5);						
+						} else {
+							drawBox(i, &p1Unmatched, 0.5);
+						}
 					} else {
 						drawBox(i, &p1Matched, 0.4);
 						p1scoreCount++;
@@ -564,25 +569,23 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				} else if (m_selectedShape[i] == 2) {
 					if (p2Score < limit) {
 						p2Passed = false;
-						drawBox(i, &p2Unmatched, 0.5);
+						if (p1Score> limit) {
+							drawBox(i, &p1InWrongBox, 0.5);						
+						} else {
+							drawBox(i, &p2Unmatched, 0.5);
+						}
 					} else {
 						drawBox(i, &p2Matched, 0.4);
 						p2scoreCount++;
 					}
 				}
-				ShapeStatus(p1scoreCount,p2scoreCount);
-
 			}
+
+			ShapeStatus(p1scoreCount,p2scoreCount);
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
-			//printf("ShapeIndex %d\n",ShapeIndex);
-
 			if (ShapeIndex > 0) { //if shape is being displayed.
-
-
-				//ShapeStatus(p1Passed?1:0, p2Passed?1:0);
-
 
 				if (p1Passed || p2Passed) //Someone won!
 				{

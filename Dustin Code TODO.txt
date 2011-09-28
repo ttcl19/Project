@@ -1,18 +1,9 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-
-TODO: 
-
-
-- implement shape tweeting for every shape.
-
+Send OSC format commands for Kyle's sound work
 
 
 - Improve image quality
-
-
-Send OSC format commands for Kyle's sound work. Using Kinect To Max as sample - uses Ventuz
-- according to Kyle's message format.
 
 
 1) Bugfix: "Player 1" can only win by making the shape on the left. "Player 2" can only win by making the shape on the right. This shouldn't matter, as players won't come in conveniently in the right order. The bugfix should ensure that the boxes are coloured correctly, and p1Passed and p2Passed will be the correct values.

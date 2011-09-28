@@ -34,6 +34,15 @@ TCHAR				g_szAppTitle[256];		// Application title
 extern "C" _declspec(dllexport) void openKinectWindow();
 extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr));
 
+extern "C" _declspec(dllexport) int setOSCEvents(void (*GameStart)(),
+	void (*RoundStart)(), 
+	void (*Countdown)(int timeRemaining), 
+	void (*Timeout)(), 
+	void (*ShapeCompleted)(int winner), 
+	void (*ShapeStatus)(int shape1, int shape2)	
+	);
+
+
 extern "C" _declspec(dllexport) int numericCommand(int cmd);
 
 int numericCommand(int cmd) {
@@ -114,6 +123,10 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
+	printf("Round Start....\n");
+	RoundStart();
+	printf("Round Start....End\n");
+
 }
 
 void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
@@ -226,6 +239,22 @@ int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, 
 {
 	g_CSkeletalViewerApp.globalAlloc = globalAlloc;
 	g_CSkeletalViewerApp.TweetPicture = TweetPicture;
+	return 0;
+}
+
+int setOSCEvents(void (*GameStart)(),
+	void (*RoundStart)(), 
+	void (*Countdown)(int timeRemaining), 
+	void (*Timeout)(), 
+	void (*ShapeCompleted)(int winner), 
+	void (*ShapeStatus)(int shape1, int shape2)	
+	)
+{
+	g_CSkeletalViewerApp.RoundStart = RoundStart;
+	g_CSkeletalViewerApp.Countdown = Countdown;
+	g_CSkeletalViewerApp.Timeout = Timeout;
+	g_CSkeletalViewerApp.ShapeCompleted = ShapeCompleted;
+	g_CSkeletalViewerApp.ShapeStatus = ShapeStatus;
 	return 0;
 }
 

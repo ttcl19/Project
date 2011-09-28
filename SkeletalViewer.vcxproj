@@ -94,7 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawDevice.h" />
-    <ClInclude Include="Modified\resource.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ShapeLibrary.h" />
     <ClInclude Include="SkeletalViewer.h" />

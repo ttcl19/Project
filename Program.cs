@@ -21,7 +21,13 @@ namespace BodyTetrisWrapper
         const bool TWEETING_ENABLED = false;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int IntFunc(int i);
+        public delegate void VoidFunc();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void IntFunc(int i);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void TwoIntFunc(int i, int j);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr AllocFunc(int i);
@@ -41,6 +47,9 @@ namespace BodyTetrisWrapper
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int setTweetback(AllocFunc allocGlobal, TweetFunc tweetBack);
 
+        [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int setOSCEvents(VoidFunc RoundStart, IntFunc Countdown, VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus);
+
         private static IntPtr allocGlobal(int size)
         {
             IntPtr memPtr = Marshal.AllocHGlobal(size);
@@ -52,6 +61,15 @@ namespace BodyTetrisWrapper
         static Twitpic twittershh = new Twitpic("TweetrisTOshh", "squiggle");
 
         static int numPhotos = 0;
+
+        public static void makeImage(byte[] pixels, int w, int h, string Filename)
+        {
+            //puts file in /images/ directory
+            //puts empty file in /images_names/ directory.
+            SavePNG(pixels, w, h, "images/"+Filename);
+            FileStream stream = new FileStream("images_names/" + Filename, FileMode.Create);
+            stream.Close();
+        }
 
         public static int SavePNG(byte[] pixels, int w, int h, string Filename)
         {
@@ -97,7 +115,7 @@ namespace BodyTetrisWrapper
                 string TweetString = Tetronimos.GetString(shape, orientation);
                 string TweetFileName = "" + TweetString + " " + numPhotos + ".png";
 
-                SavePNG(pixels, w, h, TweetFileName);
+                SavePNG(pixels, w, h, TweetFileName); //mainstream pictures
 
                 if (TWEETING_ENABLED)
                     twitter.UploadPhoto(pixels, TweetString, TweetFileName);
@@ -116,11 +134,7 @@ namespace BodyTetrisWrapper
 
                         for (int i = 0; i < 4; i++)
                         {
-                            SavePNG(blocks[i], w, w, TweetShhString + (i+1) + ".png");
-                            if (TWEETING_ENABLED)
-                            {
-                                twittershh.UploadPhoto(blocks[i], TweetShhString + (i + 1), TweetShhString + (i + 1) + ".png");
-                            }
+                            makeImage(blocks[i], w, w, TweetShhString + (i + 1) + ".png");
                         }
                         break;
                     case 2: //LEL
@@ -157,10 +171,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ".png");
 
                         break;
                     case 3: //REL
@@ -197,10 +211,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
                         
                         break;
                     case 4: //SQUARE
@@ -209,10 +223,10 @@ namespace BodyTetrisWrapper
                         blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
                         blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
 
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "1,1" + ".png");
                         break;
 
                     case 5: // Z/RESS
@@ -236,10 +250,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
 
                         break;
 
@@ -277,10 +291,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
                         break;
                     case 7: // S/LESS
                         switch (orientation)
@@ -303,10 +317,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        SavePNG(blocks[0], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        SavePNG(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        SavePNG(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        SavePNG(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeImage(blocks[0], squareSize, squareSize, TweetShhString + "0,1" + ".png");
+                        makeImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        makeImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
                         break;
                 }
                 
@@ -342,8 +356,8 @@ namespace BodyTetrisWrapper
             SetUpOSCPort();
 
             AllocFunc allocGlobalFunc = new AllocFunc(Program.allocGlobal);
-            TweetFunc tweetbackFunc = new TweetFunc(Program.TweetPicture);
-            int ret = setTweetback(allocGlobalFunc,tweetbackFunc);
+            int ret = setTweetback(allocGlobalFunc, new TweetFunc(Program.TweetPicture));
+            ret = setOSCEvents(Program.RoundStart, Program.Countdown, Program.Timeout, Program.ShapeCompleted, Program.ShapeStatus);
 
             Action KinectLoop = new Action(openKinectWindow);
             KinectLoop.BeginInvoke(null, null);
@@ -359,18 +373,6 @@ namespace BodyTetrisWrapper
                 {
                     int number = Convert.ToInt32(input);
                     numericCommand(number);
-
-                    //HACK OSC
-                    OscBundle bundle = new OscBundle();
-                    OscElement message = new OscElement("/I/am/sending/you/five", 5);
-
-                    bundle.AddElement(message);
-                    
-                    
-                    //send bundle
-                    OSCSender.Send(bundle);
-
-
                 }
                 catch
                 {
@@ -383,6 +385,57 @@ namespace BodyTetrisWrapper
 
         }
 
-        
+        //OSC Events
+        public static void GameStart()
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/gamestart"));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+        public static void RoundStart()
+        {
+            Console.WriteLine("Sending Round Start");
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/roundstart"));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+        public static void PersonMissing()
+        {
+            //TODO PersonMissing
+        }
+        public static void Countdown(int timeRemaining)
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/countdown", timeRemaining));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+        public static void Timeout()
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/timeout"));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+        public static void ShapeCompleted(int winner)
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/pwins", winner));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+        public static void ShapeStatus(int shape1, int shape2)
+        {
+            Console.WriteLine("Got Shape Status");
+
+
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/shape1", shape1));
+            bundle.AddElement(new OscElement("/shape2", shape2));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
     }
 }

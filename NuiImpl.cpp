@@ -279,7 +279,8 @@ DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
                 pthis->Nui_BlankSkeletonScreen( GetDlgItem( pthis->m_hWnd, IDC_SKELETALVIEW ) );
                 pthis->m_bScreenBlanked = true;
             }
-        }
+		}
+
 
         // Process signal events
         switch(nEventIdx)
@@ -367,7 +368,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
     {
         return;
     }
-
 
     NuiImageBuffer * pTexture = pImageFrame->pFrameTexture;
     KINECT_LOCKED_RECT LockedRect;
@@ -486,7 +486,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			memcpy(m_videoEffects,m_videoCache,640*480*4);
 
 			//tetris box drawing
-
 			bool p1Passed = true, p2Passed = true;
 
 			int gap = 640 - m_boxWidth * m_numHBox;
@@ -562,9 +561,12 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 			//printf("ShapeIndex %d\n",ShapeIndex);
 
-			if (ShapeIndex > 0) {
+			if (ShapeIndex > 0) { //if shape is being displayed.
 
-				if (p1Passed || p2Passed)
+
+				//ShapeStatus(p1Passed?1:0, p2Passed?1:0);
+
+				if (p1Passed || p2Passed) //Someone won!
 				{
 					if (p1Passed && p2Passed) {
 						bool chooseP1 = (rand() % 2 == 0);
@@ -585,30 +587,10 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					m_timeLimit = 0; //This line would end gameplay if you wanted.
 
-					//TODO new shape
+					// new shape
 					newRandomShape();
 				}
 			}
-
-			 //picture-in-picture
-			/*double PIPscale = 0.3;
-			RECT PIPRect;
-			//below random-seeming w/h values are based on how big IDC_VIDEO_VIEW is drawn.
-			int width = 548;//640;
-			int height = 455;//480;
-
-			//draw RGB Captured
-			double CapturedScale = 0.2;
-			for (int c = 0; c < m_NumCapturedPictures; c++)
-			{
-				RECT CapturedRect;
-				CapturedRect.left = c*CapturedScale*width;
-				CapturedRect.right = (c+1)*CapturedScale*width;
-				CapturedRect.top = (long)(height - height*CapturedScale);
-				CapturedRect.bottom = height;
-
-				m_DrawVideo.DrawRect( (BYTE*) m_CapturedPictures[c], &CapturedRect);
-			}*/
 
 			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
 		

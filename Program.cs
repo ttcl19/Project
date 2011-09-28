@@ -357,13 +357,21 @@ namespace BodyTetrisWrapper
             OSCSender = new UdpWriter("127.0.0.1", OSC_PORT);
         }
 
+        static List<Delegate> DontThrowOutMaDelegates = new List<Delegate>();
+
         static void Main(string[] args)
         {
             SetUpOSCPort();
-
+            
             AllocFunc allocGlobalFunc = new AllocFunc(Program.allocGlobal);
-            int ret = setTweetback(allocGlobalFunc, new TweetFunc(Program.TweetPicture));
-            ret = setOSCEvents(Program.RoundStart, Program.Countdown, Program.Timeout, Program.ShapeCompleted, Program.ShapeStatus);
+            TweetFunc TweetPictureDel = new TweetFunc(Program.TweetPicture); DontThrowOutMaDelegates.Add(TweetPictureDel);
+            int ret = setTweetback(allocGlobalFunc, TweetPictureDel);
+            VoidFunc RoundStartDel = new VoidFunc(Program.RoundStart); DontThrowOutMaDelegates.Add(RoundStartDel);
+            IntFunc CountdownDel = new IntFunc(Program.Countdown); DontThrowOutMaDelegates.Add(CountdownDel);
+            VoidFunc TimeoutDel = new VoidFunc(Program.Timeout); DontThrowOutMaDelegates.Add(TimeoutDel);
+            IntFunc ShapeCompletedDel = new IntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
+            TwoIntFunc ShapeStatusDel = new TwoIntFunc(Program.ShapeStatus); DontThrowOutMaDelegates.Add(ShapeStatusDel);
+            ret = setOSCEvents(RoundStartDel, CountdownDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel);
 
             Action KinectLoop = new Action(openKinectWindow);
             KinectLoop.BeginInvoke(null, null);

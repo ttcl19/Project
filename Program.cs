@@ -53,7 +53,6 @@ namespace BodyTetrisWrapper
         private static IntPtr allocGlobal(int size)
         {
             IntPtr memPtr = Marshal.AllocHGlobal(size);
-            //HACK allocatedGlobalPtrs.Add(memPtr);
             return memPtr;
         }
 
@@ -67,14 +66,15 @@ namespace BodyTetrisWrapper
             //puts file in /images/ directory
             //puts empty file in /images_names/ directory.
             SavePNG(pixels, w, h, "full_images/"+Filename);
-            //FileStream stream = new FileStream("images_names/" + Filename, FileMode.Create);
-            //stream.Close();
+            FileStream stream = new FileStream("full_images_names/" + Filename, FileMode.Create);
+            stream.Close();
         }
 
         public static void makeBlockImage(byte[] pixels, int w, int h, string Filename)
         {
             SavePNG(pixels, w, h, "block_images/" + Filename);
-
+            FileStream stream = new FileStream("block_images_names/" + Filename, FileMode.Create);
+            stream.Close();
         }
 
         public static int SavePNG(byte[] pixels, int w, int h, string Filename)
@@ -446,8 +446,8 @@ namespace BodyTetrisWrapper
 
 
             OscBundle bundle = new OscBundle();
-            bundle.AddElement(new OscElement("/shape1", shape1));
-            bundle.AddElement(new OscElement("/shape2", shape2));
+            bundle.AddElement(new OscElement("/shape1/" + shape1));
+            bundle.AddElement(new OscElement("/shape2/" + shape2));
             //send bundle
             OSCSender.Send(bundle);
         }

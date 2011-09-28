@@ -564,7 +564,21 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			if (ShapeIndex > 0) { //if shape is being displayed.
 
 
-				ShapeStatus(p1Passed?1:0, p2Passed?1:0);
+				ShapeStatus(1,3);
+				//ShapeStatus(p1Passed?1:0, p2Passed?1:0);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 				if (p1Passed || p2Passed) //Someone won!
 				{

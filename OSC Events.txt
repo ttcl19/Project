@@ -3,15 +3,15 @@
 /gamestart
  
 -      Round Start
-/roundstart
+ /roundstart
 	o  When two people enter OR next shape.
 
 -      Game Clock, eg. how much time is counting down
-/countdown/<time remaining in ms>
+ /countdown/<time remaining in ms>
 - give it every second
 
 -      Time out – game round end failure
-/timeout
+ /timeout
  
 -      Shape completed (win)
 	o  Which user

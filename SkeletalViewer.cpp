@@ -123,10 +123,8 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
-	printf("Round Start....\n");
+	printf("m_timeLimit %i\n",m_timeLimit);
 	RoundStart();
-	printf("Round Start....End\n");
-
 }
 
 void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
@@ -178,6 +176,8 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
+	printf("m_timeLimit %i",m_timeLimit);
+
 }
 
 int MessageBoxResource(HWND hwnd,UINT nID,UINT nType)
@@ -207,6 +207,7 @@ return (nRet);
 
 			// Initialize and start NUI processing
 			g_CSkeletalViewerApp.Nui_Init();
+
 
 			// Set the font for Frames Per Second
 			GetObject((HFONT) GetStockObject(DEFAULT_GUI_FONT),sizeof(lf),&lf);

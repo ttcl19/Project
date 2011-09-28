@@ -65,6 +65,8 @@ void CSkeletalViewerApp::Nui_Zero()
 
 HRESULT CSkeletalViewerApp::Nui_Init()
 {
+	printf("NuiInit\n");
+
 	m_numHBox = 6;
 	m_numVBox = 4;
 	m_boxHeight = 100;
@@ -77,8 +79,10 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	srand((UINT) GetTickCount64());
 	m_selectedShape = NULL;
 
-	m_timeLimit = 0;
-	m_timeAvailable = 100 * 1000;
+	m_timeLimit = 1;
+	m_timeLimit = 10;
+	m_timeAvailable = 100 * 1000; //HACK make 10 seconds later.
+	lastCountdownMessageSent = -1;
 
 	m_NumCapturedPictures = 0;
 
@@ -354,7 +358,6 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
     NuiImageStreamReleaseFrame( m_pVideoStreamHandle, pImageFrame );
 }
 
-
 void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of the interaction happens.
 {
     const NUI_IMAGE_FRAME * pImageFrame = NULL;
@@ -377,6 +380,14 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
     {
         BYTE * pBuffer = (BYTE*) LockedRect.pBits;
 
+		//printf("time remaining: %i\n",m_timeLimit - GetTickCount64());
+		//current time
+		int timeRemaining = (int)(m_timeLimit - GetTickCount64());
+		if (timeRemaining/1000 != lastCountdownMessageSent)
+		{
+			Countdown(timeRemaining);
+			lastCountdownMessageSent = timeRemaining/1000;
+		}
 		if (GetTickCount64() < m_timeLimit) {
 			
 			//Copying the array to PlayerRun pointer 
@@ -529,6 +540,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				//them appropriately
 				//m_selectedshape points to an array containing the bitmap of the desire of 
 				//the desired shape with 0,1 and 2. etc. 
+				int p1scoreCount = 0, p2scoreCount = 0;
 				if (m_selectedShape == NULL || 
 					m_selectedShape[i] == 0) {
 					if (p1Score >= limit) {
@@ -546,6 +558,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						drawBox(i, &p1Unmatched, 0.5);
 					} else {
 						drawBox(i, &p1Matched, 0.4);
+						p1scoreCount++;
 					}
 				} else if (m_selectedShape[i] == 2) {
 					if (p2Score < limit) {
@@ -553,8 +566,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						drawBox(i, &p2Unmatched, 0.5);
 					} else {
 						drawBox(i, &p2Matched, 0.4);
+						p2scoreCount++;
 					}
 				}
+				ShapeStatus(p1scoreCount,p2scoreCount);
+
 			}
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
@@ -564,20 +580,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			if (ShapeIndex > 0) { //if shape is being displayed.
 
 
-				ShapeStatus(1,3);
 				//ShapeStatus(p1Passed?1:0, p2Passed?1:0);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 				if (p1Passed || p2Passed) //Someone won!
@@ -590,6 +593,8 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					int pPassedNum = p1Passed ? 1 : 2;
 
+					ShapeCompleted(pPassedNum);
+
 					TwitterPost(ShapeIndex, ori, Shapes::X1(ShapeIndex,ori,pPassedNum)*m_boxWidth +x_box_offset, 
 						Shapes::Y1(ShapeIndex,ori,pPassedNum)*m_boxHeight+y_box_offset, 
 						Shapes::X2(ShapeIndex,ori,pPassedNum)*m_boxWidth+x_box_offset,
@@ -599,7 +604,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					//TODO "flash" effect or something awesome.
 
-					m_timeLimit = 0; //This line would end gameplay if you wanted.
+					//HACK m_timeLimit = 0; //This line would end gameplay if you wanted.
 
 					// new shape
 					newRandomShape();
@@ -609,6 +614,12 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
 		
 		} else {
+			//out of time
+			if (m_timeLimit != 0)
+			{
+				Timeout();
+				m_timeLimit = 0;
+			}
 			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}
 

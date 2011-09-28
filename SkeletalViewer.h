@@ -109,6 +109,7 @@ private:
 
 	ULONGLONG	  m_timeLimit;
 	ULONGLONG	  m_timeAvailable; //Before Round ends
+	int			  lastCountdownMessageSent; //for OSC
 
     int           m_LastSkeletonFoundTime;
     bool          m_bScreenBlanked;

@@ -270,6 +270,7 @@ DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
             int FrameDelta = pthis->m_FramesTotal - pthis->m_LastFramesTotal;
             pthis->m_LastFramesTotal = pthis->m_FramesTotal;
             SetDlgItemInt( pthis->m_hWnd, IDC_FPS, FrameDelta,FALSE );
+			printf("Framerate: %i\n",FrameDelta);
         }
 
         // Perform skeletal panel blanking

@@ -140,7 +140,7 @@ namespace BodyTetrisWrapper
 
                         for (int i = 0; i < 4; i++)
                         {
-                            makeBlockImage(blocks[i], w, w, TweetShhString + (i + 1) + ".png");
+                            makeBlockImage(blocks[i], w, w, TweetShhString + "0,"+ i + ".png");
                         }
                         break;
                     case 2: //LEL

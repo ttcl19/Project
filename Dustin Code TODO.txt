@@ -1,7 +1,14 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
+- include time remaining in round
+
+- score feedback.
+
 - Debug Kyle's OSC stuff
  - include /gamestart event.
+ - Holding:
+  - /holding1 /holding2
+  - /holdfail1 /holdfail2
 
 - calibrate shape sizes against background
 

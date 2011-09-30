@@ -37,6 +37,8 @@ extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size),
 extern "C" _declspec(dllexport) int setOSCEvents(
 	void (*RoundStart)(), 
 	void (*Countdown)(int timeRemaining), 
+	void (*Holding)(int player), 
+	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner), 
 	void (*ShapeStatus)(int shape1, int shape2)	
@@ -246,6 +248,8 @@ int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, 
 int setOSCEvents(
 	void (*RoundStart)(), 
 	void (*Countdown)(int timeRemaining), 
+	void (*Holding)(int player), 
+	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner), 
 	void (*ShapeStatus)(int shape1, int shape2)	
@@ -253,6 +257,8 @@ int setOSCEvents(
 {
 	g_CSkeletalViewerApp.RoundStart = RoundStart;
 	g_CSkeletalViewerApp.Countdown = Countdown;
+	g_CSkeletalViewerApp.Holding = Holding;
+	g_CSkeletalViewerApp.HoldFail = HoldFail;
 	g_CSkeletalViewerApp.Timeout = Timeout;
 	g_CSkeletalViewerApp.ShapeCompleted = ShapeCompleted;
 	g_CSkeletalViewerApp.ShapeStatus = ShapeStatus;

@@ -568,17 +568,27 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 			ShapeStatus(p1scoreCount,p2scoreCount); //OSC
 
-			if (p1Passed)
+			if (p1Passed) {
+				if (p1MatchProgress == 0)
+					Holding(1); //first time holding
 				p1MatchProgress++;
-			else
+			} else {
+				if (p1MatchProgress > 0)
+					HoldFail(1); //first time failing
 				p1MatchProgress = 0;
+			}
 			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/FRAMES_FOR_MATCH,
 				y_box_offset-40,y_box_offset,&progressBox,1.0);
 
-			if (p2Passed)
+			if (p2Passed) {
+				if (p2MatchProgress == 0)
+					Holding(2); //first time holding
 				p2MatchProgress++;
-			else
+			} else {
+				if (p2MatchProgress > 0)
+					HoldFail(2); //first time failing
 				p2MatchProgress = 0;
+			}
 			drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/FRAMES_FOR_MATCH,
 				y_box_offset-40,y_box_offset,&progressBox,1.0);
 
@@ -633,37 +643,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 		ULONGLONG diff = (ULONGLONG) ((1.0 / m_FramesTotal - 1.0 / 30) * 1000);
 		diff = 0;
 		m_videoDelay = GetTickCount64() + diff;
-
-		//HACK
-
-		ShapeCompleted(1);
-		ShapeCompleted(2);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
     else

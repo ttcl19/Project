@@ -53,6 +53,8 @@ public:
 	//OSC Stuff
 	void	(*RoundStart)();
 	void	(*Countdown)(int timeRemaining);
+	void	(*Holding)(int player);
+	void	(*HoldFail)(int player);
 	void	(*Timeout)(); 
 	void	(*ShapeCompleted)(int winner);
 	void	(*ShapeStatus)(int shape1, int shape2);

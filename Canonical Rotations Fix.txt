@@ -1,0 +1,53 @@
+objects of type LEL give row+col values:
+[2,0],[1,0],[0,1],[0,0]
+
+x	x	_
+x	_	_
+x	_	_
+
+but expected values are:
+[0,0],[0,1],[1,1],[2,1] // LEL
+x	x	_
+_	x	_
+_	x	_
+
+RESS is fine
+
+your SQUARE: [1,1],[1,0],[0,1],[0,0]
+x	x	_
+x	x	_
+_	_	_
+
+expected: [1,0],[2,0],[1,1],[2,1]
+_	_	_
+x	x	_
+x	x	_
+
+LESS: [0,0],[0,1],[1,1],[2,1]  (from block id 14)
+x	x	_
+_	x	_
+_	x	_
+
+expected: [0,0],[1,0],[1,1],[2,1] 
+x	_	_
+x	x	_
+_	x	_
+
+REL: [2,2][1,1],[0,1],[0,0] (from block id 22)
+x	x	_
+_	x	_
+_	_	x
+
+expected: [2,0],[0,1],[1,1],[2,1]
+_	x	_
+_	x	_
+x	x	_
+
+TEE:[2,0],[1,1],[0,0],[MISSING]
+x	_	_
+?	x	_
+x	_	_
+expected: [0,2],[1,2],[2,2],[1,1]
+_	_	x
+_	x	x
+_	_	x

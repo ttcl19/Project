@@ -124,8 +124,7 @@ namespace BodyTetrisWrapper
 
                 makeFullImage(pixels, w, h, TweetFileName); //mainstream pictures
 
-                if (TWEETING_ENABLED)
-                    twitter.UploadPhoto(pixels, TweetString, TweetFileName);
+                //twitter.UploadPhoto(pixels, TweetString, TweetFileName);
 
                 string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + ori + ",";
 
@@ -133,6 +132,7 @@ namespace BodyTetrisWrapper
 
                 switch (shape)
                 {
+                    //Derek's canonical rotations: convention: [row, column], i.e. [y,x]
                     case 1: //LINE
                         blocks[0] = ImageUtils.ImageSubset(pixels, w, h, 0, 0, w, h * 1 / 4);
                         blocks[1] = ImageUtils.ImageSubset(pixels, w, h, 0, h * 1 / 4, w, h * 2 / 4);
@@ -230,10 +230,10 @@ namespace BodyTetrisWrapper
                         blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
                         blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
 
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "1,0" + ".png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
                         break;
 
                     case 5: // Z/RESS
@@ -402,7 +402,7 @@ namespace BodyTetrisWrapper
 
         }
 
-        //OSC Events
+#region OSC Events
         public static void GameStart()
         {
             OscBundle bundle = new OscBundle();
@@ -429,23 +429,25 @@ namespace BodyTetrisWrapper
             //send bundle
             OSCSender.Send(bundle);
         }
-
         public static void Holding(int player)
         {
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/holding", player));
             //send bundle
             OSCSender.Send(bundle);
-        }
 
+            Console.WriteLine("/holding" + player);
+        }
         public static void HoldingFail(int player)
         {
             OscBundle bundle = new OscBundle();
-            bundle.AddElement(new OscElement("/HoldFail", player));
+            bundle.AddElement(new OscElement("/holdfail", player));
             //send bundle
             OSCSender.Send(bundle);
-        }
 
+            Console.WriteLine("/holdfail" + player);
+
+        }
         public static void Timeout()
         {
             OscBundle bundle = new OscBundle();
@@ -472,4 +474,6 @@ namespace BodyTetrisWrapper
             OSCSender.Send(bundle);
         }
     }
+#endregion
+
 }

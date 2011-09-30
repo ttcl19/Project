@@ -109,8 +109,6 @@ namespace BodyTetrisWrapper
                 case 1: //I
                     //only one orientation.
                     return true;
-
-                    break;
                 case 2: //J
                     switch (orientation)
                     {

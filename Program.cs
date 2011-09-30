@@ -48,7 +48,8 @@ namespace BodyTetrisWrapper
         public static extern int setTweetback(AllocFunc allocGlobal, TweetFunc tweetBack);
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int setOSCEvents(VoidFunc RoundStart, IntFunc Countdown, VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus);
+        public static extern int setOSCEvents(VoidFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
+            VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus);
 
         private static IntPtr allocGlobal(int size)
         {
@@ -368,10 +369,12 @@ namespace BodyTetrisWrapper
             int ret = setTweetback(allocGlobalFunc, TweetPictureDel);
             VoidFunc RoundStartDel = new VoidFunc(Program.RoundStart); DontThrowOutMaDelegates.Add(RoundStartDel);
             IntFunc CountdownDel = new IntFunc(Program.Countdown); DontThrowOutMaDelegates.Add(CountdownDel);
+            IntFunc HoldingDel = new IntFunc(Program.Holding); DontThrowOutMaDelegates.Add(HoldingDel);
+            IntFunc HoldFailDel = new IntFunc(Program.HoldingFail); DontThrowOutMaDelegates.Add(HoldFailDel);
             VoidFunc TimeoutDel = new VoidFunc(Program.Timeout); DontThrowOutMaDelegates.Add(TimeoutDel);
             IntFunc ShapeCompletedDel = new IntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
             TwoIntFunc ShapeStatusDel = new TwoIntFunc(Program.ShapeStatus); DontThrowOutMaDelegates.Add(ShapeStatusDel);
-            ret = setOSCEvents(RoundStartDel, CountdownDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel);
+            ret = setOSCEvents(RoundStartDel, CountdownDel, HoldingDel, HoldFailDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel);
 
             Action KinectLoop = new Action(openKinectWindow);
             KinectLoop.BeginInvoke(null, null);
@@ -426,6 +429,23 @@ namespace BodyTetrisWrapper
             //send bundle
             OSCSender.Send(bundle);
         }
+
+        public static void Holding(int player)
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/holding", player));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+
+        public static void HoldingFail(int player)
+        {
+            OscBundle bundle = new OscBundle();
+            bundle.AddElement(new OscElement("/HoldFail", player));
+            //send bundle
+            OSCSender.Send(bundle);
+        }
+
         public static void Timeout()
         {
             OscBundle bundle = new OscBundle();

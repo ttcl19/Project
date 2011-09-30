@@ -1,10 +1,9 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-- include time remaining in round
+- visual feedback on which player won
+ - visual feedback that winning happened (flashing of the shape?)
 
-- score feedback.
-
-- Debug Kyle's OSC stuff
+- Kyle's OSC stuff
  - include /gamestart event.
  - Holding:
   - /holding1 /holding2
@@ -12,6 +11,22 @@
 
 - calibrate shape sizes against background
 
+- game should start automatically when played in visual studio
+ - (optional) fix memory access violation error when running from executable
+
+- progress bar showing time remaining in round
+ - reset to 10 seconds duration (controllable by command line commands?)
+
 - Improve image quality - will use desklamps
+
+- (optional) score points up to total out of 10
+
+
+
+
+
+
+
+
 
 

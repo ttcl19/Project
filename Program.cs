@@ -436,14 +436,19 @@ namespace BodyTetrisWrapper
             bundle.AddElement(new OscElement("/holding", player));
             //send bundle
             OSCSender.Send(bundle);
+
+            Console.WriteLine("/holding" + player);
         }
 
         public static void HoldingFail(int player)
         {
             OscBundle bundle = new OscBundle();
-            bundle.AddElement(new OscElement("/HoldFail", player));
+            bundle.AddElement(new OscElement("/holdfail", player));
             //send bundle
             OSCSender.Send(bundle);
+
+            Console.WriteLine("/holdfail" + player);
+
         }
 
         public static void Timeout()

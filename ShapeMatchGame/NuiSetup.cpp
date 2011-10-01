@@ -4,8 +4,6 @@
 #include "resource.h"
 #include <mmsystem.h>
 
-
-
 void CSkeletalViewerApp::Nui_Zero()
 {
     m_hNextDepthFrameEvent = NULL;

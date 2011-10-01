@@ -424,7 +424,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					int pWinNum = p1Win ? 1 : 2;
 
-					ShapeCompleted(pWinNum);
 
 					if (pWinNum == 1)
 					{
@@ -436,6 +435,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						p2Points++;
 						lastPointWinner = 2;
 					}
+					ShapeCompleted(pWinNum, p1Points, p2Points); //reporting current point.
 					if (p1Points > pMaxPoints || p2Points > pMaxPoints)
 					{
 						p1Points = 0; p2Points = 0;
@@ -448,14 +448,13 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					//image captured - hide shape.
 
-
-					//HACK m_timeLimit = 0; //This line would end gameplay if you wanted.
+					//m_timeLimit = 0; //This line would end gameplay if you wanted.
 
 					winningShapeDisplay = 60;
 					for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
 						winningShapeStatus[i] = pWinNum == m_selectedShape[i]?pWinNum:0;
 					}
-
+					p1MatchProgress = 0; p2MatchProgress = 0;
 
 					// new shape
 					newRandomShape();
@@ -503,8 +502,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 		int remaining = (int)(GetTickCount64() - m_timeLimit);
 		//printf("%i",320 - remaining/m_timeAvailable,320);
 		//drawRect(320 - remaining/m_timeAvailable,320 + remaining/m_timeAvailable ,y_box_offset- 70, y_box_offset- 50,&remainingBox,1.0);
-
-			
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 

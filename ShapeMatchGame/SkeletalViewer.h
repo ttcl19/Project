@@ -58,7 +58,7 @@ public:
 	void	(*Holding)(int player);
 	void	(*HoldFail)(int player);
 	void	(*Timeout)(); 
-	void	(*ShapeCompleted)(int winner);
+	void	(*ShapeCompleted)(int winner, int p1Score, int p2Score);
 	void	(*ShapeStatus)(int shape1, int shape2);
 	void	(*PlayerStatus)(int* players);
 

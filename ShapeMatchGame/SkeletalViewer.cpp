@@ -35,15 +35,15 @@ extern "C" _declspec(dllexport) void openKinectWindow();
 extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr));
 
 extern "C" _declspec(dllexport) int setOSCEvents(
-	void (*RoundStart)(), 
+	void (*RoundStart)(int goalShape, int orientation, int* goalShapeStatus), 
 	void (*Countdown)(int timeRemaining), 
 	void (*Holding)(int player), 
 	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner), 
-	void (*ShapeStatus)(int shape1, int shape2)	
+	void (*ShapeStatus)(int shape1, int shape2),
+	void (*PlayerStatus)(int* players)
 	);
-
 
 extern "C" _declspec(dllexport) int numericCommand(int cmd);
 
@@ -126,7 +126,12 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
 	printf("m_timeLimit %i\n",m_timeLimit);
-	RoundStart();
+	
+	if (m_selectedShape != 0)
+	{
+		RoundStart(ShapeIndex,ori,m_selectedShape);
+	}
+
 }
 
 void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
@@ -248,22 +253,29 @@ int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, 
 }
 
 int setOSCEvents(
-	void (*RoundStart)(), 
+	void (*RoundStart)(int goalShape, int orientation, int* goalShapeStatus), 
 	void (*Countdown)(int timeRemaining), 
 	void (*Holding)(int player), 
 	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner), 
-	void (*ShapeStatus)(int shape1, int shape2)	
+	void (*ShapeStatus)(int shape1, int shape2),
+	void (*PlayerStatus)(int* players)
 	)
 {
 	g_CSkeletalViewerApp.RoundStart = RoundStart;
+	g_CSkeletalViewerApp.goalShapeStatus = (int*)g_CSkeletalViewerApp.globalAlloc(4*6*sizeof(int));
+
+
 	g_CSkeletalViewerApp.Countdown = Countdown;
 	g_CSkeletalViewerApp.Holding = Holding;
 	g_CSkeletalViewerApp.HoldFail = HoldFail;
 	g_CSkeletalViewerApp.Timeout = Timeout;
 	g_CSkeletalViewerApp.ShapeCompleted = ShapeCompleted;
 	g_CSkeletalViewerApp.ShapeStatus = ShapeStatus;
+	g_CSkeletalViewerApp.PlayerStatus = PlayerStatus;
+	g_CSkeletalViewerApp.players = (int*)g_CSkeletalViewerApp.globalAlloc(4*6*sizeof(int));
+
 	return 0;
 }
 

@@ -33,6 +33,12 @@ namespace BodyTetrisWrapper
         public delegate IntPtr AllocFunc(int i);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void VoidPtrPassFunc(IntPtr ptr);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void IntNPtrPassFunc(int i, int j, IntPtr ptr);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int PtrPassFunc(IntPtr ptr);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -48,8 +54,8 @@ namespace BodyTetrisWrapper
         public static extern int setTweetback(AllocFunc allocGlobal, TweetFunc tweetBack);
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int setOSCEvents(VoidFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
-            VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus);
+        public static extern int setOSCEvents(IntNPtrPassFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
+            VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus, VoidPtrPassFunc PlayerStatus);
 
         private static IntPtr allocGlobal(int size)
         {
@@ -59,7 +65,7 @@ namespace BodyTetrisWrapper
 
         static Twitpic twitter = new Twitpic("TweetrisTO","squiggle");
         static Twitpic twittershh = new Twitpic("TweetrisTOshh", "squiggle");
-
+        static Logger logger;
         static int numPhotos = 0;
 
         public static void makeFullImage(byte[] pixels, int w, int h, string Filename)
@@ -332,8 +338,10 @@ namespace BodyTetrisWrapper
                         makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + "," +imgExt);
                         break;
                 }
-                
-            
+
+                //HACK Marshal.FreeHGlobal(ptr);
+                //this may cause slowdown - do it on another thread?
+                //TODO free image memory to prevent memory leak...
             }
             catch (Exception e)
             {
@@ -365,26 +373,31 @@ namespace BodyTetrisWrapper
         static void Main(string[] args)
         {
             SetUpOSCPort();
-            
+
+            logger = new Logger("./log/log.txt");
+
             AllocFunc allocGlobalFunc = new AllocFunc(Program.allocGlobal);
             TweetFunc TweetPictureDel = new TweetFunc(Program.TweetPicture); DontThrowOutMaDelegates.Add(TweetPictureDel);
             int ret = setTweetback(allocGlobalFunc, TweetPictureDel);
-            VoidFunc RoundStartDel = new VoidFunc(Program.RoundStart); DontThrowOutMaDelegates.Add(RoundStartDel);
+            IntNPtrPassFunc RoundStartDel = new IntNPtrPassFunc(Program.RoundStart); DontThrowOutMaDelegates.Add(RoundStartDel);
             IntFunc CountdownDel = new IntFunc(Program.Countdown); DontThrowOutMaDelegates.Add(CountdownDel);
             IntFunc HoldingDel = new IntFunc(Program.Holding); DontThrowOutMaDelegates.Add(HoldingDel);
             IntFunc HoldFailDel = new IntFunc(Program.HoldingFail); DontThrowOutMaDelegates.Add(HoldFailDel);
             VoidFunc TimeoutDel = new VoidFunc(Program.Timeout); DontThrowOutMaDelegates.Add(TimeoutDel);
             IntFunc ShapeCompletedDel = new IntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
             TwoIntFunc ShapeStatusDel = new TwoIntFunc(Program.ShapeStatus); DontThrowOutMaDelegates.Add(ShapeStatusDel);
-            ret = setOSCEvents(RoundStartDel, CountdownDel, HoldingDel, HoldFailDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel);
+            VoidPtrPassFunc PlayerStatusDel = new VoidPtrPassFunc(Program.PlayerStatus); DontThrowOutMaDelegates.Add(PlayerStatusDel);
+            ret = setOSCEvents(RoundStartDel, CountdownDel, HoldingDel, HoldFailDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel, PlayerStatusDel);
+
+            GameStart();
 
             Action KinectLoop = new Action(openKinectWindow);
             KinectLoop.BeginInvoke(null, null);
 
             bool run = true;
 
-            Console.WriteLine("Type -1 and press ENTER to start game.");
-            
+            //Console.WriteLine("Type -1 and press ENTER to start game.");
+
             while (run)
             {
                 string input = Console.ReadLine();
@@ -412,13 +425,18 @@ namespace BodyTetrisWrapper
             //send bundle
             OSCSender.Send(bundle);
         }
-        public static void RoundStart()
+        public static void RoundStart(int goalShape, int orientation, IntPtr goalShapeStatus) 
         {
             Console.WriteLine("Sending Round Start");
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/roundstart"));
             //send bundle
             OSCSender.Send(bundle);
+
+            int[] goalShapes = new int[4*6];
+            Marshal.Copy(goalShapeStatus, goalShapes, 0, 4*6);
+
+            logger.AddLogWithTime("RoundStart " + numPhotos + " " + goalShape + " " + orientation, goalShapes);
         }
         public static void PersonMissing()
         {
@@ -452,6 +470,8 @@ namespace BodyTetrisWrapper
             bundle.AddElement(new OscElement("/timeout"));
             //send bundle
             OSCSender.Send(bundle);
+
+            logger.AddLogWithTime("Timeout");
         }
         public static void ShapeCompleted(int winner)
         {
@@ -459,17 +479,26 @@ namespace BodyTetrisWrapper
             bundle.AddElement(new OscElement("/pwins", winner));
             //send bundle
             OSCSender.Send(bundle);
+            
+            logger.AddLogWithTime("Win " + winner);
         }
         public static void ShapeStatus(int shape1, int shape2)
         {
             //Console.WriteLine("Got Shape Status");
-
 
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/shape1/" + shape1));
             bundle.AddElement(new OscElement("/shape2/" + shape2));
             //send bundle
             OSCSender.Send(bundle);
+        }
+
+        public static void PlayerStatus(IntPtr players)
+        {
+            int[] playerShapes = new int[4 * 6];
+            Marshal.Copy(players, playerShapes, 0, 4 * 6);
+
+            logger.AddLogWithTime("Players ", playerShapes);
         }
     }
 #endregion

@@ -491,13 +491,19 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			UINT p1Score, p2Score;
 			UINT limit = 0.3 * m_boxHeight * m_boxWidth;
 
+			//clear player presence grid
+			for (int i = 0; i < m_numHBox * m_numVBox; i++)
+			{
+				players[i] = 0;
+			}
+
 			//this loop iterates through each of the boxes in the Tetris grid, calculating scores and drawing.
 			for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
 				startX = (i % m_numHBox) * m_boxWidth + gap / 2;			
 				startY = (i / m_numHBox) * m_boxHeight + y_box_offset;
 				pPlayerRun = m_playerMap + startY * 640 + startX;
 
-				//Calculates the scores 
+				//Calculates the scores, i.e. how much the player is in each box.
 				p1Score = 0;
 				p2Score = 0;
 				//m_p1Index was initialized to be -1 
@@ -516,6 +522,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					pPlayerRun += m_boxWidth * (m_numHBox - 1) + gap;
 				}
+
+				if (p1Score >= limit)
+					players[i] += 1;
+				if (p2Score >= limit)
+					players[i] += 2;
 
 				//colours the box in if the player occupies the threshold score 
 				//m_selectedshape is defined in the header file(SkeletalViewer.h)
@@ -565,6 +576,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			}
 
 			ShapeStatus(p1scoreCount,p2scoreCount); //OSC
+			PlayerStatus(players);
 
 			if (p1Passed) {
 				if (p1MatchProgress == 0)

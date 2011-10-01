@@ -51,13 +51,18 @@ public:
     void*					(*globalAlloc)(int size);
 
 	//OSC Stuff
-	void	(*RoundStart)();
+	void	(*RoundStart)(int goalShape, int orientation, int* goalShapeStatus);
 	void	(*Countdown)(int timeRemaining);
 	void	(*Holding)(int player);
 	void	(*HoldFail)(int player);
 	void	(*Timeout)(); 
 	void	(*ShapeCompleted)(int winner);
 	void	(*ShapeStatus)(int shape1, int shape2);
+	void	(*PlayerStatus)(int* players);
+
+
+	int *		              players;
+	int *                   goalShapeStatus;
 
 	int						TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
 	int						numericCommand(int cmd);

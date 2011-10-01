@@ -174,7 +174,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 
 void CSkeletalViewerApp::drawRect(int X1, int X2, int Y1, int Y2, RGBQUAD * color, double opacity)
 {
-	RGBQUAD * pixel = m_videoEffects + Y1 * 640 + Y2;
+	RGBQUAD * pixel = m_videoEffects + Y1 * 640 + X1;
 
 	for (UINT j = 0; j < Y2-Y1; j++) {
 		for (UINT k = 0; k < (X2-X1); k++) {

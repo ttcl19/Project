@@ -156,8 +156,6 @@ HRESULT CSkeletalViewerApp::Nui_Init()
     return hr;
 }
 
-
-
 void CSkeletalViewerApp::Nui_UnInit( )
 {
     ::SelectObject( m_SkeletonDC, m_SkeletonOldObj );
@@ -577,6 +575,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 					HoldFail(1); //first time failing
 				p1MatchProgress = 0;
 			}
+
 			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/FRAMES_FOR_MATCH,
 				y_box_offset-40,y_box_offset,&progressBox,1.0);
 

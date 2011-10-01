@@ -2,10 +2,12 @@
 
 - Derek Canonical rotation.
 
-- fix line double-tweeting??
+- fix LINE double-tweeting??
 
 - visual feedback on which player won
  - visual feedback that winning happened (flashing of the shape?)
+
+- holding progress bar shows up in the right location.
 
 - numPhotos updates properly.
 

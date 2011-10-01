@@ -216,6 +216,8 @@ return (nRet);
 			lf.lfHeight*=4;
 			g_CSkeletalViewerApp.m_hFontFPS=CreateFontIndirect(&lf);
 			SendDlgItemMessage(hWnd,IDC_FPS,WM_SETFONT,(WPARAM) g_CSkeletalViewerApp.m_hFontFPS,0);
+
+			g_CSkeletalViewerApp.newRandomShape(); //Start the game!
 			}
 			break;
 

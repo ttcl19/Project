@@ -16,35 +16,35 @@ namespace BodyTetrisWrapper
             switch(shape)
             {
                 case 1:
-                    msg += "drill";
-                    msg += " " + orientation;
+                    msg += "Drill";
+                    //msg += " " + orientation;
                     break;
                 case 2:
-                    msg += "knight";
-                    msg += " " + orientation;
+                    msg += "Knight";
+                   // msg += " " + orientation;
                     break;
                 case 3:
-                    msg += "anti-knight";
-                    msg += " " + orientation;
+                    msg += "Anti-Knight";
+                    //msg += " " + orientation;
                     break;
                 case 4:
-                    msg += "box";
+                    msg += "Box";
                     break;
                 case 5:
-                    msg += "lightning";
+                    msg += "Lightning";
                     msg += " " + orientation;
                     break;
                 case 6:
-                    msg += "hat";
-                    msg += " " + orientation;
+                    msg += "Hat";
+                    //msg += " " + orientation;
                     break;
                 case 7:
-                    msg += "anti-lightning";
-                    msg += " " + orientation;
+                    msg += "Anti-Lightning";
+                    //msg += " " + orientation;
                     break;
 
             }
-            return "shape";
+            return msg;
         }
 
         public static string GetShhName(int shape )

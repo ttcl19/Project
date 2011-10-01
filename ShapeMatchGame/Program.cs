@@ -126,7 +126,7 @@ namespace BodyTetrisWrapper
 
                 //twitter.UploadPhoto(pixels, TweetString, TweetFileName);
 
-                string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + ori + ",";
+                string TweetShhString = "BLOCK," + numPhotos + "," + Tetronimos.GetShhName(shape) + "," + 90*ori + ",";
 
                 byte[][] blocks = new byte[4][];
 
@@ -141,7 +141,7 @@ namespace BodyTetrisWrapper
 
                         for (int i = 0; i < 4; i++)
                         {
-                            makeBlockImage(blocks[i], w, w, TweetShhString + "0,"+ i + ".png");
+                            makeBlockImage(blocks[i], w, w, TweetShhString + i + ",0"+ i + ",.png");
                         }
                         break;
                     case 2: //LEL
@@ -178,10 +178,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,2" + ",.png");
 
                         break;
                     case 3: //REL
@@ -218,10 +218,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ",.png");
                         
                         break;
                     case 4: //SQUARE
@@ -230,10 +230,10 @@ namespace BodyTetrisWrapper
                         blocks[2] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 0);
                         blocks[3] = ImageUtils.ImageGetSquare(pixels, w, h, squareSize, 1, 1);
 
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "2,0" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "1,0" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "2,0" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ",.png");
                         break;
 
                     case 5: // Z/RESS
@@ -257,10 +257,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "0,1" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,1" + ",.png");
 
                         break;
 
@@ -298,10 +298,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,0" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ",.png");
                         break;
                     case 7: // S/LESS
                         switch (orientation)
@@ -324,10 +324,10 @@ namespace BodyTetrisWrapper
                             blocks[i] = ImageUtils.RotateImage90s(blocks[i], squareSize, squareSize, orientation);
                         }
                         //ROW,COL
-                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,1" + ".png");
-                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ".png");
-                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ".png");
-                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ".png");
+                        makeBlockImage(blocks[0], squareSize, squareSize, TweetShhString + "0,1" + ",.png");
+                        makeBlockImage(blocks[1], squareSize, squareSize, TweetShhString + "1,1" + ",.png");
+                        makeBlockImage(blocks[2], squareSize, squareSize, TweetShhString + "1,0" + ",.png");
+                        makeBlockImage(blocks[3], squareSize, squareSize, TweetShhString + "2,0" + ",.png");
                         break;
                 }
                 

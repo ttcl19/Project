@@ -5,19 +5,20 @@
 - visual feedback on which player won
  - visual feedback that winning happened (flashing of the shape?)
 
+- numPhotos updates properly.
+
 - calibrate shape sizes against background
 
 - Kate & Derek's colour suggestions:
 Having the 4 colors is a little confusing. What if it were just 2 - green for the shape and red for out of bounds. For the green it could be more opaque and/or brighter if the square is "filled" and a less opaque for the square that needs to be filled.
 An alternate or additional approach would be to grey or black out the squares where there is no block or body so that all you see is the shapes and body parts that are out of bounds
 
-- game should start automatically when played in visual studio
- - (optional) fix memory access violation error when running from executable
-
 - progress bar showing time remaining in round
  - reset to 10 seconds duration (controllable by command line commands?)
 
 - allow for collaborative block completion & increase holding time (1 second, etcetera).
+
+- check memory usage rate...
 
 - logging
  - increasing images numbers (BLOCK_ID) and times
@@ -26,6 +27,8 @@ An alternate or additional approach would be to grey or black out the squares wh
 - score points up to total out of 10
 
 - Improve image quality - will use desklamps
+
+- (optional) fix memory access violation error when running from executable
 
 
 

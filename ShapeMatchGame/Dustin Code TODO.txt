@@ -1,34 +1,35 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-- Derek Canonical rotation.
-
-- logging
- - increasing images numbers (BLOCK_ID) and times
- - record status of goal array and block array in every frame (30 fps)
-
-- fix LINE double-tweeting??
-
-- visual feedback on which player won
- - visual feedback that winning happened (flashing of the shape?)
-
-- Difficulty: limit is lower for places players should be, higher for places they shouldn't be.
-
-- numPhotos updates properly.
-
-- calibrate shape sizes against background
 
 - Kate & Derek's colour suggestions:
 Having the 4 colors is a little confusing. What if it were just 2 - green for the shape and red for out of bounds. For the green it could be more opaque and/or brighter if the square is "filled" and a less opaque for the square that needs to be filled.
 An alternate or additional approach would be to grey or black out the squares where there is no block or body so that all you see is the shapes and body parts that are out of bounds
-
-- progress bar showing time remaining in round
- - reset to 10 seconds duration (controllable by command line commands?)
-
 - allow for collaborative block completion & increase holding time (1 second, etcetera).
 
+- visual feedback on which player won
+ - visual feedback that winning happened (flashing of the shape?)
+
+
+
+
+
+- Derek Canonical rotation?
+
+- fix LINE double-tweeting??
+
+- Difficulty: limit is lower for places players should be, higher for places they shouldn't be.
+
+
+
+
+- progress bar showing time remaining in round
+ - code in place, but buggy.
+
+- numPhotos updates properly, based on last time?
+
+- calibrate shape sizes against background
+
 - check memory usage rate...
-
-
 
 - score points up to total out of 10
 

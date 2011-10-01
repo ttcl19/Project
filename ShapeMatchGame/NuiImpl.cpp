@@ -59,7 +59,7 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 
 	m_timeLimit = 1;
 	m_timeLimit = 10;
-	m_timeAvailable = 100 * 1000; //HACK make 10 seconds later.
+	m_timeAvailable = 10 * 1000; //HACK make 10 seconds later.
 	lastCountdownMessageSent = -1;
 
 	m_NumCapturedPictures = 0;
@@ -350,9 +350,9 @@ RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
 //InWrongBox colours are for p2 is in p1's boxes, and vice versa.
 
 RGBQUAD progressBox		= {0xff, 0xff, 0xff, 0x00};
+RGBQUAD remainingBox	= {0x00, 0xff, 0xff, 0x00};
 
-
-const int FRAMES_FOR_MATCH = 15;
+const int HOLD_FRAMES_FOR_MATCH = 30;
 int p1MatchProgress = 0;
 int p2MatchProgress = 0;
 
@@ -588,7 +588,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				p1MatchProgress = 0;
 			}
 
-			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/FRAMES_FOR_MATCH,
+			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/HOLD_FRAMES_FOR_MATCH,
 				y_box_offset-40,y_box_offset,&progressBox,1.0);
 
 			if (p2Passed) {
@@ -600,11 +600,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 					HoldFail(2); //first time failing
 				p2MatchProgress = 0;
 			}
-			drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/FRAMES_FOR_MATCH,
+			drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/HOLD_FRAMES_FOR_MATCH,
 				y_box_offset-40,y_box_offset,&progressBox,1.0);
 
-			bool p1Win = p1MatchProgress >= FRAMES_FOR_MATCH;
-			bool p2Win = p2MatchProgress >= FRAMES_FOR_MATCH;
+			bool p1Win = p1MatchProgress >= HOLD_FRAMES_FOR_MATCH;
+			bool p2Win = p2MatchProgress >= HOLD_FRAMES_FOR_MATCH;
 
 			if (ShapeIndex > 0) { //if shape is being displayed.
 
@@ -627,7 +627,6 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					//image captured - hide shape.
 
-					//TODO "flash" effect or something awesome.
 
 					//HACK m_timeLimit = 0; //This line would end gameplay if you wanted.
 
@@ -648,6 +647,13 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			}
 			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}
+
+		//time remaining progress bar
+		int remaining = (int)(GetTickCount64() - m_timeLimit);
+		//printf("%i",320 - remaining/m_timeAvailable,320);
+		//drawRect(320 - remaining/m_timeAvailable,320 + remaining/m_timeAvailable ,y_box_offset- 70, y_box_offset- 50,&remainingBox,1.0);
+
+			
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 

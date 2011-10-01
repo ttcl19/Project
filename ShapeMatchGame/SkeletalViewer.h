@@ -21,6 +21,7 @@
 
 #define SZ_APPDLG_WINDOW_CLASS        _T("SkeletalViewerAppDlgWndClass")
 
+
 class CSkeletalViewerApp
 {
 public:
@@ -116,7 +117,7 @@ private:
 
 
 	ULONGLONG	  m_timeLimit;
-	ULONGLONG	  m_timeAvailable; //Before Round ends
+    ULONGLONG	  m_timeAvailable; //Before Round ends
 	int			  lastCountdownMessageSent; //for OSC
 
     int           m_LastSkeletonFoundTime;

@@ -2,6 +2,8 @@
 
 - Derek Canonical rotation.
 
+- fix line double-tweeting??
+
 - visual feedback on which player won
  - visual feedback that winning happened (flashing of the shape?)
 

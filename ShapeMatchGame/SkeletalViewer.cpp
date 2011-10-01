@@ -304,6 +304,8 @@ void openKinectWindow()
 	ShowWindow(g_hWndApp,SW_SHOW);
 	UpdateWindow(g_hWndApp);
 
+	MoveWindow(g_hWndApp,-1024,0,1024,768,true);
+
 	// Main message loop:
 	while(GetMessage(&msg,NULL,0,0)) 
 	{

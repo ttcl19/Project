@@ -1,15 +1,6 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-
-
-- Derek Canonical rotation?
-
-- fix LINE double-tweeting??
-
 - Difficulty: limit is lower for places players should be, higher for places they shouldn't be.
-
-
-
 
 - progress bar showing time remaining in round
  - code in place, but buggy.
@@ -18,11 +9,11 @@
 
 - calibrate shape sizes against background
 
-- check memory usage rate...
+- fix LINE double-tweeting?
 
-- score points up to total out of 10
+- (optional) check memory usage rate...
 
-- Improve image quality - will use desklamps
+- (optional) highlight last point winner.
 
 - (optional) fix memory access violation error when running from executable
 

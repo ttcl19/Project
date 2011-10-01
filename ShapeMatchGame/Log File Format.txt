@@ -2,21 +2,21 @@ DateTime = Month-Day-24Hour:Minutes:Seconds.Milliseconds
 
 Time = time in milliseconds since logging was started. May restart during the game...
 
-DateTime Time LogStart
+DateTime Time "LogStart"
  - logging is started (or restarted)
 
-DateTime Time GameStart
+DateTime Time "GameStart"
  - whenever game is restarted
 
-DateTime Time RoundStart NumPhotos/BLOCK_ID Shape Orientation 0,0,0,0,1,1,1,1,0,0,0,0,0,2,2,2,
+DateTime Time "RoundStart" NumPhotos/BLOCK_ID Shape Orientation 0,0,0,0,1,1,1,1,0,0,0,0,0,2,2,2,
  - array of 4x6 = 24 of the game space, with 1 as p1 goal positions, 2 as p2 goal positions.
 
-DateTime Time Players 0,0,0,0,1,1,1,1,2,2,2,3,2,1,1,1,...
+DateTime Time "Players" 0,0,0,0,1,1,1,1,2,2,2,3,2,1,1,1,...
  - array of 4x6 = 24 showing player presence. 3 means both players are there.
 
-DateTime Time Timeout
+DateTime Time "Timeout"
  - neither player made the appropriate shape in time.
 
-DateTime Time Win 1
+DateTime Time "Win" WinningPlayer Player1Score Player2Score
  - Player 1 or 2 won.
 

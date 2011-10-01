@@ -40,7 +40,7 @@ extern "C" _declspec(dllexport) int setOSCEvents(
 	void (*Holding)(int player), 
 	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
-	void (*ShapeCompleted)(int winner), 
+	void (*ShapeCompleted)(int winner, int p1Score, int p2Score), 
 	void (*ShapeStatus)(int shape1, int shape2),
 	void (*PlayerStatus)(int* players)
 	);
@@ -258,14 +258,13 @@ int setOSCEvents(
 	void (*Holding)(int player), 
 	void (*HoldFail)(int player), 
 	void (*Timeout)(), 
-	void (*ShapeCompleted)(int winner), 
+	void (*ShapeCompleted)(int winner, int p1Score, int p2Score), 
 	void (*ShapeStatus)(int shape1, int shape2),
 	void (*PlayerStatus)(int* players)
 	)
 {
 	g_CSkeletalViewerApp.RoundStart = RoundStart;
 	g_CSkeletalViewerApp.goalShapeStatus = (int*)g_CSkeletalViewerApp.globalAlloc(4*6*sizeof(int));
-
 
 	g_CSkeletalViewerApp.Countdown = Countdown;
 	g_CSkeletalViewerApp.Holding = Holding;

@@ -30,6 +30,9 @@ namespace BodyTetrisWrapper
         public delegate void TwoIntFunc(int i, int j);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void ThreeIntFunc(int i, int j, int k);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr AllocFunc(int i);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -55,7 +58,7 @@ namespace BodyTetrisWrapper
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int setOSCEvents(IntNPtrPassFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
-            VoidFunc Timeout, IntFunc ShapeCompleted, TwoIntFunc ShapeStatus, VoidPtrPassFunc PlayerStatus);
+            VoidFunc Timeout, ThreeIntFunc ShapeCompleted, TwoIntFunc ShapeStatus, VoidPtrPassFunc PlayerStatus);
 
         private static IntPtr allocGlobal(int size)
         {
@@ -384,7 +387,7 @@ namespace BodyTetrisWrapper
             IntFunc HoldingDel = new IntFunc(Program.Holding); DontThrowOutMaDelegates.Add(HoldingDel);
             IntFunc HoldFailDel = new IntFunc(Program.HoldingFail); DontThrowOutMaDelegates.Add(HoldFailDel);
             VoidFunc TimeoutDel = new VoidFunc(Program.Timeout); DontThrowOutMaDelegates.Add(TimeoutDel);
-            IntFunc ShapeCompletedDel = new IntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
+            ThreeIntFunc ShapeCompletedDel = new ThreeIntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
             TwoIntFunc ShapeStatusDel = new TwoIntFunc(Program.ShapeStatus); DontThrowOutMaDelegates.Add(ShapeStatusDel);
             VoidPtrPassFunc PlayerStatusDel = new VoidPtrPassFunc(Program.PlayerStatus); DontThrowOutMaDelegates.Add(PlayerStatusDel);
             ret = setOSCEvents(RoundStartDel, CountdownDel, HoldingDel, HoldFailDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel, PlayerStatusDel);
@@ -438,6 +441,7 @@ namespace BodyTetrisWrapper
 
             logger.AddLogWithTime("RoundStart " + numPhotos + " " + goalShape + " " + orientation, goalShapes);
         }
+
         public static void PersonMissing()
         {
             //TODO PersonMissing
@@ -473,14 +477,14 @@ namespace BodyTetrisWrapper
 
             logger.AddLogWithTime("Timeout");
         }
-        public static void ShapeCompleted(int winner)
+        public static void ShapeCompleted(int winner, int scoreP1, int scoreP2)
         {
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/pwins", winner));
             //send bundle
             OSCSender.Send(bundle);
             
-            logger.AddLogWithTime("Win " + winner);
+            logger.AddLogWithTime("Win " + winner + " " + scoreP1 + " " + scoreP2);
         }
         public static void ShapeStatus(int shape1, int shape2)
         {

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html manifest="tetris.manifest">
+<head>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="apple-touch-icon" href="iphon_tetris_icon.png"/>
+    <link rel="apple-touch-startup-image" href="startup.jpg" />
+    <link rel="stylesheet" href="tetris.css" type="text/css" media="screen and (max-width: 700px), mobile" title="main" charset="utf-8">
+    <link rel="stylesheet" href="tetris_big.css" type="text/css" media="screen and (min-width: 701px)" title="main" charset="utf-8">
+    <script type="text/javascript" src="jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="jquery.jtwitter.min.js"></script>
+	<script type="text/javascript" src="jquery.jgfeed-min.js"></script>    
+
+<!--    <script src="http://platform.twitter.com/anywhere.js?id=DR8gXIxmjN23c86FXP5JMQ&v=1" type="text/javascript"></script>-->
+    <title>tweetrisTO</title>
+</head>
+
+<body>
+
+<div id="tetris">
+    <div id="ownz">
+
+<div style="text-align:left;width:155px;float:left;margin-left:5px;"><a href="http://twitter.com/tweetrisTO">@tweetrisTO</a></div><div style="text-align:right;white-space:nowrap;width:155px;margin-right:5px;float:left;"><a href="https://www.facebook.com/pages/TweetrisTO/275700035788734">Project info</a></div>
+    </div>
+    
+<div id="board" style="float: right; border: 1px solid black;">Board<br /></div> 
+    <div class="game_area">
+        <div id="canvas"></div>
+    </div>
+    <div id="info">
+        <div id="next_shape">asdfasdf</div>
+        <p id="level">Level: <span></span></p>
+        <p id="lines">Lines: <span></span></p>
+        <p id="score">Score: <span></span></p>
+        <p id="time">Time: <span></span></p>
+    </div>
+
+</div>
+<script type="text/javascript">
+if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+  	document.write('<div id="controls" class="show_controls">');
+	document.write('<div class="control move_left"><div class="for_help move_left"><span>L</span></div></div>');
+    document.write('<div class="control move_right"><div class="for_help move_right"><span>R</span></div></div>');
+    document.write('<div class="control move_rotate"><div class="for_help move_rotate"><span>Rotate</span></div></div>');
+    document.write('<div class="control move_down"><div class="for_help move_down"><span>down</span></div></div>');
+    document.write('<div class="control move_pause"><div class="move_pause"><span>Pause</span></div></div>');
+    document.write('<div class="control move_show_controls"><div class="move_show_controls"><span>Show Control</span></div></div>');
+	document.write('</div>');
+ } else {
+   document.write('<div id="controls" class="show_controls">');
+    document.write('<div class="control move_left"><div class="for_help move_left"><span> </span></div></div>');
+    document.write('<div class="control move_right"><div class="for_help move_right"><span> </span></div></div>');
+    document.write('<div class="control move_rotate"><div class="for_help move_rotate"><span> </span></div></div>');
+    document.write('<div class="control move_down"><div class="for_help move_down"><span> </span></div></div>');
+    document.write('<div class="control move_pause"><div class="move_pause"><span>tweetris</span></div></div>');
+    document.write('<div class="control move_show_controls"><div class="move_show_controls"><span> </span></div></div>');
+	document.write('</div>');	
+ }
+</script>
+<script type="text/javascript">
+		function isiPhone () {
+	    	return (
+    	    	(navigator.userAgent.indexOf("iPhone") !== -1) ||
+        		(navigator.userAgent.indexOf("iPod") !== -1)
+    		);
+		}        	
+</script>
+<script type="text/javascript" src="tetris.js"></script>
+<!--<div id="twitter-connect-placeholder"></div>
+<script type="text/javascript">
+ 
+  twttr.anywhere(function (T) {
+ 
+    var currentUser,
+        screenName,
+        profileImage,
+        profileImageTag;
+ 
+    if (T.isConnected()) {
+      currentUser = T.currentUser;
+      screenName = currentUser.data('screen_name');
+      profileImage = currentUser.data('profile_image_url');
+      profileImageTag = "<img src='" + profileImage + "'/>";
+      $('#twitter-connect-placeholder').append("Logged in as " + profileImageTag + " " + screenName);
+    } else {
+      T("#twitter-connect-placeholder").connectButton();
+    };
+ 
+  });
+ 
+</script>
+<span id="follow-tweetris"></span>
+<script type="text/javascript">
+ 
+  twttr.anywhere(function (T) {
+    T('#follow-tweetris').followButton("tweetrisTO");
+  });
+ 
+</script>
+
+<div id="tbox"></div>
+<script type="text/javascript">
+ 
+  twttr.anywhere(function (T) { 
+    T("#tbox").tweetBox({
+      height: 50,
+      width: 220,
+      label: "",
+      defaultContent: "@TweetrisTO I need a LEL #blockRequest"
+    });
+ 
+  });
+ 
+</script>
+-->
+</body>
+</html>

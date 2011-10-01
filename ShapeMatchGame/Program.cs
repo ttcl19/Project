@@ -39,6 +39,10 @@ namespace BodyTetrisWrapper
         public delegate void VoidPtrPassFunc(IntPtr ptr);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void PlayerStatusFunc(float i, float j, IntPtr ptr);
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void IntNPtrPassFunc(int i, int j, IntPtr ptr);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -58,7 +62,7 @@ namespace BodyTetrisWrapper
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int setOSCEvents(IntNPtrPassFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
-            VoidFunc Timeout, ThreeIntFunc ShapeCompleted, TwoIntFunc ShapeStatus, VoidPtrPassFunc PlayerStatus);
+            VoidFunc Timeout, ThreeIntFunc ShapeCompleted, TwoIntFunc ShapeStatus, PlayerStatusFunc PlayerStatus);
 
         private static IntPtr allocGlobal(int size)
         {
@@ -389,7 +393,7 @@ namespace BodyTetrisWrapper
             VoidFunc TimeoutDel = new VoidFunc(Program.Timeout); DontThrowOutMaDelegates.Add(TimeoutDel);
             ThreeIntFunc ShapeCompletedDel = new ThreeIntFunc(Program.ShapeCompleted); DontThrowOutMaDelegates.Add(ShapeCompletedDel);
             TwoIntFunc ShapeStatusDel = new TwoIntFunc(Program.ShapeStatus); DontThrowOutMaDelegates.Add(ShapeStatusDel);
-            VoidPtrPassFunc PlayerStatusDel = new VoidPtrPassFunc(Program.PlayerStatus); DontThrowOutMaDelegates.Add(PlayerStatusDel);
+            PlayerStatusFunc PlayerStatusDel = new PlayerStatusFunc(Program.PlayerStatus); DontThrowOutMaDelegates.Add(PlayerStatusDel);
             ret = setOSCEvents(RoundStartDel, CountdownDel, HoldingDel, HoldFailDel, TimeoutDel, ShapeCompletedDel, ShapeStatusDel, PlayerStatusDel);
 
             GameStart();
@@ -497,12 +501,12 @@ namespace BodyTetrisWrapper
             OSCSender.Send(bundle);
         }
 
-        public static void PlayerStatus(IntPtr players)
+        public static void PlayerStatus(float p1z, float p2z, IntPtr players)
         {
             int[] playerShapes = new int[4 * 6];
             Marshal.Copy(players, playerShapes, 0, 4 * 6);
 
-            logger.AddLogWithTime("Players ", playerShapes);
+            logger.AddLogWithTime("Players " + p1z + " " + p2z + " ", playerShapes);
         }
     }
 #endregion

@@ -46,7 +46,7 @@ public class Main {
             	
             	
             	//1 - Upload
-                boolean uploaded = uploader.upload(imagename, "ouech!", LoginInfo.FULL_LOGIN, LoginInfo.FULL_PASSWORD);
+                boolean uploaded = uploader.upload(imagename, list[i].substring(0, list[i].length()-4), LoginInfo.FULL_LOGIN, LoginInfo.FULL_PASSWORD);
                 if (!uploaded) {
                 	System.out.println("Error while uploading " + list[i]); 
                 }

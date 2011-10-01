@@ -1,9 +1,18 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
-- Difficulty: limit is lower for places players should be, higher for places they shouldn't be.
-
 - progress bar showing time remaining in round
  - code in place, but buggy.
+
+- Java should upload to correct twitter accounts.
+
+
+- Difficulty: limit is lower for places players should be, higher for places they shouldn't be.
+
+- log file should record z positions of skeleton
+
+
+
+
 
 - numPhotos updates properly, based on last time?
 

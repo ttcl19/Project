@@ -11,8 +11,9 @@ DateTime Time "GameStart"
 DateTime Time "RoundStart" NumPhotos/BLOCK_ID Shape Orientation 0,0,0,0,1,1,1,1,0,0,0,0,0,2,2,2,
  - array of 4x6 = 24 of the game space, with 1 as p1 goal positions, 2 as p2 goal positions.
 
-DateTime Time "Players" 0,0,0,0,1,1,1,1,2,2,2,3,2,1,1,1,...
+DateTime Time "Players"  0,0,0,0,1,1,1,1,2,2,2,3,2,1,1,1,...
  - array of 4x6 = 24 showing player presence. 3 means both players are there.
+ - (deleted) p1z and p2Z will always have a value, possibly due to a frame that was a long time ago. Should check for presense of a player in the array.
 
 DateTime Time "Timeout"
  - neither player made the appropriate shape in time.

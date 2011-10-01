@@ -60,11 +60,12 @@ public:
 	void	(*Timeout)(); 
 	void	(*ShapeCompleted)(int winner, int p1Score, int p2Score);
 	void	(*ShapeStatus)(int shape1, int shape2);
-	void	(*PlayerStatus)(int* players);
+	void	(*PlayerStatus)(float p1z, float p2z, int* players);
 
 
 	int *		            players;
 	int *                   goalShapeStatus;
+	float					lastp1z, lastp2z;
 
 	int						TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
 	int						numericCommand(int cmd);

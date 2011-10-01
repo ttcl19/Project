@@ -38,6 +38,8 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 
 	winningShapeStatus = new int[4*6];
 
+	lastp1z = -1; lastp2z = -1;
+
 	p1Points = 0; p2Points = 0; pMaxPoints = 10; lastPointWinner = 0;
 
 	m_p1Index = -1;

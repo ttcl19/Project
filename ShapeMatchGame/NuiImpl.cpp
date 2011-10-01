@@ -301,6 +301,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			int startX, startY;
 			UINT p1Score, p2Score;
 			UINT limit = 0.3 * m_boxHeight * m_boxWidth;
+			UINT inLimit = 0.2 * m_boxHeight * m_boxWidth;
 
 			//clear player presence grid
 			for (int i = 0; i < m_numHBox * m_numVBox; i++)
@@ -361,7 +362,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						drawBox(i, &ignored, 0.1);
 					}
 				} else if (m_selectedShape[i] == 1) {
-					if (p1Score > limit || p2Score > limit)
+					if (p1Score > inLimit || p2Score > inLimit)
 					{
 						drawBox(i, &p1Unmatched, 0.7);
 						p1scoreCount++;
@@ -370,7 +371,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						drawBox(i, &p1Unmatched, 0.3);
 					}
 				} else if (m_selectedShape[i] == 2) {
-					if (p1Score > limit || p2Score > limit)
+					if (p1Score > inLimit || p2Score > inLimit)
 					{
 						drawBox(i, &p2Unmatched, 0.7);
 						p2scoreCount++;
@@ -382,7 +383,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			}
 
 			ShapeStatus(p1scoreCount,p2scoreCount); //OSC
-			PlayerStatus(players);
+			PlayerStatus(lastp1z, lastp2z, players);
 
 			if (p1Passed) {
 				if (p1MatchProgress == 0)
@@ -395,7 +396,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			}
 
 			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/HOLD_FRAMES_FOR_MATCH,
-				y_box_offset-40,y_box_offset,&progressBox,1.0);
+				y_box_offset-20,y_box_offset,&progressBox,1.0);
 
 			if (p2Passed) {
 				if (p2MatchProgress == 0)
@@ -407,7 +408,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				p2MatchProgress = 0;
 			}
 			drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/HOLD_FRAMES_FOR_MATCH,
-				y_box_offset-40,y_box_offset,&progressBox,1.0);
+				y_box_offset-20,y_box_offset,&progressBox,1.0);
 
 			bool p1Win = p1MatchProgress >= HOLD_FRAMES_FOR_MATCH;
 			bool p2Win = p2MatchProgress >= HOLD_FRAMES_FOR_MATCH;
@@ -476,18 +477,26 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			//show points
 			for (int i = 0; i < p1Points; i++)
 			{
-				drawRect(320 - 30 - 25*i, 320 - 10 - 25*i,y_box_offset-70,y_box_offset-50,&p1Unmatched,0.9);
+				drawRect(320 - 30 - 25*i, 320 - 10 - 25*i,y_box_offset-70,y_box_offset-60,&p1Unmatched,0.9);
 			}
 
 			for (int i = 0; i < p2Points; i++)
 			{
-				drawRect(320 + 10 + 25*i,320 + 30 + 25*i,y_box_offset-70,y_box_offset-50,&p2Unmatched,0.9);
+				drawRect(320 + 10 + 25*i,320 + 30 + 25*i,y_box_offset-70,y_box_offset-60,&p2Unmatched,0.9);
+			}
+
+			//time remaining progress bar
+			int remaining = (int)( m_timeLimit - GetTickCount64());
+			//printf("%i %i\n", (int)(320 - 320*remaining/(float)m_timeAvailable), (int)(320 + 320*remaining/(float)m_timeAvailable));
+			if (remaining > 0)
+			{
+				drawRect((int)(320 - 320*remaining/(float)m_timeAvailable),(int)(320 + 320*remaining/(float)m_timeAvailable) ,y_box_offset- 50, y_box_offset- 40,&remainingBox,1.0);
 			}
 
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
 			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
-		
+			
 		} else {
 			//out of time
 			if (m_timeLimit != 0)
@@ -498,10 +507,11 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}
 
-		//time remaining progress bar
-		int remaining = (int)(GetTickCount64() - m_timeLimit);
-		//printf("%i",320 - remaining/m_timeAvailable,320);
-		//drawRect(320 - remaining/m_timeAvailable,320 + remaining/m_timeAvailable ,y_box_offset- 70, y_box_offset- 50,&remainingBox,1.0);
+		
+
+
+
+
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
@@ -525,18 +535,18 @@ void CSkeletalViewerApp::Nui_GotSkeletonAlert( )
 
     HRESULT hr = NuiSkeletonGetNextFrame( 0, &SkeletonFrame );
 
-    bool bFoundSkeleton = true;
+    bool NotFoundSkeleton = true;
     for( int i = 0 ; i < NUI_SKELETON_COUNT ; i++ )
     {
         if( SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED )
         {
-            bFoundSkeleton = false;
+            NotFoundSkeleton = false;
         }
     }
 
     // no skeletons!
     //
-    if( bFoundSkeleton )
+    if( NotFoundSkeleton )
     {
         return;
     }
@@ -556,6 +566,7 @@ void CSkeletalViewerApp::Nui_GotSkeletonAlert( )
         if( SkeletonFrame.SkeletonData[i].eTrackingState == NUI_SKELETON_TRACKED )
         {
             Nui_DrawSkeleton( bBlank, &SkeletonFrame.SkeletonData[i], GetDlgItem( m_hWnd, IDC_SKELETALVIEW ), i );
+
             bBlank = false;
         }
     }

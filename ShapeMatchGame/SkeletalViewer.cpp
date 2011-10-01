@@ -42,7 +42,7 @@ extern "C" _declspec(dllexport) int setOSCEvents(
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner, int p1Score, int p2Score), 
 	void (*ShapeStatus)(int shape1, int shape2),
-	void (*PlayerStatus)(int* players)
+	void (*PlayerStatus)(float p1z, float p2z, int* players)
 	);
 
 extern "C" _declspec(dllexport) int numericCommand(int cmd);
@@ -260,7 +260,7 @@ int setOSCEvents(
 	void (*Timeout)(), 
 	void (*ShapeCompleted)(int winner, int p1Score, int p2Score), 
 	void (*ShapeStatus)(int shape1, int shape2),
-	void (*PlayerStatus)(int* players)
+	void (*PlayerStatus)(float p1z, float p2z, int* players)
 	)
 {
 	g_CSkeletalViewerApp.RoundStart = RoundStart;
@@ -304,7 +304,12 @@ void openKinectWindow()
 	ShowWindow(g_hWndApp,SW_SHOW);
 	UpdateWindow(g_hWndApp);
 
-	MoveWindow(g_hWndApp,-1024,0,1024,768,true);
+	int WindowX = -1024;
+	int WindowY = 0;
+
+	MoveWindow(g_hWndApp,WindowX,WindowY,1024,768,true);
+
+	printf("Set Window Position: %i %i\n", WindowX, WindowY);
 
 	// Main message loop:
 	while(GetMessage(&msg,NULL,0,0)) 

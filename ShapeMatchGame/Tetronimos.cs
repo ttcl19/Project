@@ -7,39 +7,55 @@ namespace BodyTetrisWrapper
 {
     static class Tetronimos
     {
+        static string[] Exclaims = new string[] { 
+            "HOLY TETRIS, IT'S  A NEW ",
+            "WATCH OUT FOR THE ",
+            "WHERE ARE YOU GOING TO FIT THIS ",
+            "OH NO, I BET YOU DIDNT WANT A ",
+            "CAN YOU HANDLE A ",
+            "COMPLETE A ROW WITH A ",
+            "WHEREFORE ART THOU ",
+            "NEXT UP, ONE ",
+            "I PROMISE, THIS IS THE LAST "
+        };
+
         public static string GetString(int shape, int orientation)
         {
             //I'm assuming for now that orientation is something basic
             // like 0,1,2,3
-
             string msg = "";
+
+            Random random = new Random(DateTime.Now.Millisecond);
+
+            msg += Exclaims[random.Next(Exclaims.Length)];
+
             switch(shape)
             {
                 case 1:
-                    msg += "Drill";
+                    msg += "DRILL";
                     //msg += " " + orientation;
                     break;
                 case 2:
-                    msg += "Knight";
+                    msg += "KNIGHT";
                    // msg += " " + orientation;
                     break;
                 case 3:
-                    msg += "Anti-Knight";
+                    msg += "ANTI-KNIGHT";
                     //msg += " " + orientation;
                     break;
                 case 4:
-                    msg += "Box";
+                    msg += "BOX";
                     break;
                 case 5:
-                    msg += "Lightning";
+                    msg += "LIGHTNING";
                     msg += " " + orientation;
                     break;
                 case 6:
-                    msg += "Hat";
+                    msg += "HAT";
                     //msg += " " + orientation;
                     break;
                 case 7:
-                    msg += "Anti-Lightning";
+                    msg += "ANTI-LIGHTNING";
                     //msg += " " + orientation;
                     break;
 

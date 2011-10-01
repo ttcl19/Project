@@ -180,6 +180,15 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 
 void CSkeletalViewerApp::drawRect(int X1, int X2, int Y1, int Y2, RGBQUAD * color, double opacity)
 {
+	if (X1 < 0)
+		return;
+	if (X2 > 640)
+		return;
+	if (Y1 < 0)
+		return;
+	if (Y2 > 480)
+		return;
+
 	RGBQUAD * pixel = m_videoEffects + Y1 * 640 + X1;
 
 	for (UINT j = 0; j < Y2-Y1; j++) {

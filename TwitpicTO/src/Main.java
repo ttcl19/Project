@@ -11,7 +11,7 @@ public class Main {
        
        // Constantly browse the image directory and upload if there are new pictures.
         while (true){
-        	System.out.println("Looking for files...");
+        	//System.out.println("Looking for files...");
         	//UPLOAD BLOCK IMAGES
         	String[] block_list = block_dir.list();
             for (int i = 0 ; i < block_list.length ; i++) {
@@ -59,6 +59,12 @@ public class Main {
             }
             
             
+            //delay, to prevent cpu hugging.
+            try {
+            	Thread.sleep(100L); // in ms
+            }
+           
+            catch (Exception e) {}
             
         }
     }

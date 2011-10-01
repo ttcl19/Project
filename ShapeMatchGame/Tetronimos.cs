@@ -54,9 +54,9 @@ namespace BodyTetrisWrapper
                 case 1:
                     return "LINE";
                 case 2:
-                    return "REL";
-                case 3:
                     return "LEL";
+                case 3:
+                    return "REL";
                 case 4:
                     return "SQUARE";
                 case 5:

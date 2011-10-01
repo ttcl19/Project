@@ -1,0 +1,176 @@
+/***********************************************************************
+*						                       *
+*                    Classification of Tetrominoes                     *
+*						                       *
+*                                                                      *
+************************************************************************/
+
+
+After review the code, I figure the following system would be most 
+suitable, given how the ShapeLibrary.h is created. 
+
+The system: 
+
+-Default Positions are the positions resembling the letters.
+-Orientations are obtained by rotating the shape COUNTERCLOCKWISE by 
+90 degrees.The first rotation would be 1, and the second rotation would 
+be 2 etc. 
+
+This enables for easy and logical array storage (which is what is already
+being used in ShapeLibrary), i.e.
+0-Default Position 
+1-First rotation
+2-Second rotation 
+3-Third Rotation 
+
+Please note that the names for the tetrominoes here were used in the code 
+for simplicity.I think we should stay consistent and save the fancy names 
+for the public.:)
+
+
+Shape I 
+
+Default Position:
+
+	*
+  	*
+	*
+	*
+
+(No other rotation availabe, we're dropping the horizontal "I" due to kinect
+constraints)
+
+
+
+
+Shape J
+
+
+Default Position: 
+
+	 *
+	 *
+	**
+
+
+First Rotation:
+
+	***
+	  *
+
+Second Rotation: 
+
+	**
+	*
+	*
+
+Third Rotation:
+
+	*
+	***
+
+
+
+
+Shape L
+
+
+Default Position:
+
+	*
+	*
+	**
+
+
+First Rotation: 
+
+	  *
+	***
+
+
+Second Rotation: 
+
+	**
+ 	 *
+	 *
+
+Third Rotation: 
+
+	***
+	*
+
+
+
+
+Shape O
+
+
+Default Position:
+
+	**
+	**
+
+
+
+Shape Z 
+
+
+Default Position: 
+
+	**
+	 **
+
+First Rotation:
+
+	 *
+	**
+	*
+
+
+
+
+Shape T
+
+
+Default Position:
+
+	***
+	 *
+
+
+First Rotation:
+
+	*
+	**
+	*
+
+Second Rotation:
+
+	 *
+	***
+
+Third Rotation:
+
+	 *
+	**
+	 *
+
+
+
+
+Shape S 
+
+
+Default Position: 
+
+	 **
+	**
+
+First Rotation:
+
+	*
+	**
+	 *
+
+	
+

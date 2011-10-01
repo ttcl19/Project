@@ -38,6 +38,7 @@ public:
 
     void					drawBox(int boxIndex, RGBQUAD * color);
     void					drawBox(int boxIndex, RGBQUAD * color,double opacity);
+	void					drawBox(int boxIndex, RGBQUAD * borderColor, RGBQUAD * color,  double opacity);
 	void					drawRect(int X1, int X2, int Y1, int Y2, RGBQUAD * color, double opacity);
 	RGBQUAD                 Nui_ShortToQuad_Depth( USHORT s );
 
@@ -62,7 +63,7 @@ public:
 	void	(*PlayerStatus)(int* players);
 
 
-	int *		              players;
+	int *		            players;
 	int *                   goalShapeStatus;
 
 	int						TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2);
@@ -70,6 +71,14 @@ public:
 
 	void					newShape(int ShapeIndex);
 	int						newRandomShape();
+
+	int						winningShapeDisplay;
+	int	*					winningShapeStatus;
+
+	int						p1Points;
+	int						p2Points;
+	int						pMaxPoints;
+	int						lastPointWinner;
 
 private:
     static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);

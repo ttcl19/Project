@@ -103,6 +103,7 @@
   <ItemGroup>
     <ClCompile Include="DrawDevice.cpp" />
     <ClCompile Include="NuiImpl.cpp" />
+    <ClCompile Include="NuiSetup.cpp" />
     <ClCompile Include="ShapeLibrary.cpp" />
     <ClCompile Include="SkeletalViewer.cpp" />
     <ClCompile Include="stdafx.cpp">

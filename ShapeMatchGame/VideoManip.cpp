@@ -119,12 +119,11 @@ void CSkeletalViewerApp::Nui_DrawSkeleton( bool bBlank, NUI_SKELETON_DATA * pSke
 
 }
 
-void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) {
+void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * borderColor, RGBQUAD * color,  double opacity) {
 	x_box_offset = 640 - m_boxWidth * m_numHBox;
 	int startX, startY;
 	UINT borderWidth = 1;
-	//black 
-	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
+	
 
 	startX = (boxIndex % m_numHBox) * m_boxWidth + x_box_offset / 2;			
 	startY = (boxIndex / m_numHBox) * m_boxHeight + y_box_offset;
@@ -132,7 +131,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 	// top border
 	for (UINT j = 0; j < borderWidth; j++) {
 		for (UINT k = 0; k < m_boxWidth; k++) {
-			*pixel = borderColor;
+			*pixel = *borderColor;
 			pixel++;
 		}
 		pixel += m_boxWidth * (m_numHBox - 1) + x_box_offset;
@@ -141,7 +140,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 	for (UINT j = 0; j < m_boxHeight - borderWidth * 2; j++) {
 		// left border
 		for (UINT k = 0; k < borderWidth; k++) {
-			*pixel = borderColor;
+			*pixel = *borderColor;
 			pixel++;
 		}
 
@@ -155,7 +154,7 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 
 		// right border
 		for (UINT k = 0; k < borderWidth; k++) {
-			*pixel = borderColor;
+			*pixel = *borderColor;
 			pixel++;
 		}
 
@@ -165,11 +164,18 @@ void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) 
 	// bottom border
 	for (UINT j = 0; j < borderWidth; j++) {
 		for (UINT k = 0; k < m_boxWidth; k++) {
-			*pixel = borderColor;
+			*pixel = *borderColor;
 			pixel++;
 		}
 		pixel += m_boxWidth * (m_numHBox - 1) + x_box_offset;
 	}
+
+}
+
+void CSkeletalViewerApp::drawBox(int boxIndex, RGBQUAD * color, double opacity) {
+	//black borders default 
+	RGBQUAD borderColor = {0x00, 0x00, 0x00, 0x00};
+	drawBox(boxIndex,&borderColor,color,opacity);
 }
 
 void CSkeletalViewerApp::drawRect(int X1, int X2, int Y1, int Y2, RGBQUAD * color, double opacity)

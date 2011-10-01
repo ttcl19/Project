@@ -17,199 +17,6 @@
 #include "resource.h"
 #include <mmsystem.h>
 
-
-
-void CSkeletalViewerApp::Nui_Zero()
-{
-    m_hNextDepthFrameEvent = NULL;
-    m_hNextVideoFrameEvent = NULL;
-    m_hNextSkeletonEvent = NULL;
-    m_pDepthStreamHandle = NULL;
-    m_pVideoStreamHandle = NULL;
-    m_hThNuiProcess=NULL;
-    m_hEvNuiProcessStop=NULL;
-    ZeroMemory(m_Pen,sizeof(m_Pen));
-    m_SkeletonDC = NULL;
-    m_SkeletonBMP = NULL;
-    m_SkeletonOldObj = NULL;
-    m_PensTotal = 6;
-    ZeroMemory(m_Points,sizeof(m_Points));
-    m_LastSkeletonFoundTime = -1;
-    m_bScreenBlanked = false;
-    m_FramesTotal = 0;
-    m_LastFPStime = -1;
-    m_LastFramesTotal = 0;
-}
-
-HRESULT CSkeletalViewerApp::Nui_Init()
-{
-	printf("NuiInit\n");
-
-	m_numHBox = 6;
-	m_numVBox = 4;
-	m_boxHeight = 100;
-	m_boxWidth = 100;
-	y_box_offset = 80;
-
-	m_p1Index = -1;
-	m_p2Index = -1;
-	
-	srand((UINT) GetTickCount64());
-	m_selectedShape = NULL;
-
-	m_timeLimit = 1;
-	m_timeLimit = 10;
-	m_timeAvailable = 10 * 1000; //HACK make 10 seconds later.
-	lastCountdownMessageSent = -1;
-
-	m_NumCapturedPictures = 0;
-
-    HRESULT                hr;
-    RECT                rc;
-
-    m_hNextDepthFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-    m_hNextVideoFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-    m_hNextSkeletonEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-
-    GetWindowRect(GetDlgItem( m_hWnd, IDC_SKELETALVIEW ), &rc );
-    int width = rc.right - rc.left;
-    int height = rc.bottom - rc.top;
-    HDC hdc = GetDC(GetDlgItem( m_hWnd, IDC_SKELETALVIEW));
-    m_SkeletonBMP = CreateCompatibleBitmap( hdc, width, height );
-    m_SkeletonDC = CreateCompatibleDC( hdc );
-    ::ReleaseDC(GetDlgItem(m_hWnd,IDC_SKELETALVIEW), hdc );
-    m_SkeletonOldObj = SelectObject( m_SkeletonDC, m_SkeletonBMP );
-
-    hr = m_DrawDepth.CreateDevice( GetDlgItem( m_hWnd, IDC_DEPTHVIEWER ) );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource( m_hWnd,IDS_ERROR_D3DCREATE,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = m_DrawDepth.SetVideoType( 320, 240, 320 * 4 );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource( m_hWnd,IDS_ERROR_D3DVIDEOTYPE,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = m_DrawVideo.CreateDevice( GetDlgItem( m_hWnd, IDC_VIDEOVIEW ) );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource( m_hWnd,IDS_ERROR_D3DCREATE,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = m_DrawVideo.SetVideoType( 640, 480, 640 * 4 );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource( m_hWnd,IDS_ERROR_D3DVIDEOTYPE,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-    
-    hr = NuiInitialize( 
-        NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX | NUI_INITIALIZE_FLAG_USES_SKELETON | NUI_INITIALIZE_FLAG_USES_COLOR);
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource(m_hWnd,IDS_ERROR_NUIINIT,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = NuiSkeletonTrackingEnable( m_hNextSkeletonEvent, 0 );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource(m_hWnd,IDS_ERROR_SKELETONTRACKING,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = NuiImageStreamOpen(
-        NUI_IMAGE_TYPE_COLOR,
-        NUI_IMAGE_RESOLUTION_640x480,
-        0,
-        2,
-        m_hNextVideoFrameEvent,
-        &m_pVideoStreamHandle );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource(m_hWnd,IDS_ERROR_VIDEOSTREAM,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    hr = NuiImageStreamOpen(
-        NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
-        NUI_IMAGE_RESOLUTION_320x240,
-        0,
-        2,
-        m_hNextDepthFrameEvent,
-        &m_pDepthStreamHandle );
-    if( FAILED( hr ) )
-    {
-        MessageBoxResource(m_hWnd,IDS_ERROR_DEPTHSTREAM,MB_OK | MB_ICONHAND);
-        return hr;
-    }
-
-    // Start the Nui processing thread
-    m_hEvNuiProcessStop=CreateEvent(NULL,FALSE,FALSE,NULL);
-    m_hThNuiProcess=CreateThread(NULL,0,Nui_ProcessThread,this,0,NULL);
-
-    return hr;
-}
-
-void CSkeletalViewerApp::Nui_UnInit( )
-{
-    ::SelectObject( m_SkeletonDC, m_SkeletonOldObj );
-    DeleteDC( m_SkeletonDC );
-    DeleteObject( m_SkeletonBMP );
-
-    if( m_Pen[0] != NULL )
-    {
-        DeleteObject(m_Pen[0]);
-        DeleteObject(m_Pen[1]);
-        DeleteObject(m_Pen[2]);
-        DeleteObject(m_Pen[3]);
-        DeleteObject(m_Pen[4]);
-        DeleteObject(m_Pen[5]);
-        ZeroMemory(m_Pen,sizeof(m_Pen));
-    }
-
-    // Stop the Nui processing thread
-    if(m_hEvNuiProcessStop!=NULL)
-    {
-        // Signal the thread
-        SetEvent(m_hEvNuiProcessStop);
-
-        // Wait for thread to stop
-        if(m_hThNuiProcess!=NULL)
-        {
-            WaitForSingleObject(m_hThNuiProcess,INFINITE);
-            CloseHandle(m_hThNuiProcess);
-        }
-        CloseHandle(m_hEvNuiProcessStop);
-    }
-
-    NuiShutdown( );
-    if( m_hNextSkeletonEvent && ( m_hNextSkeletonEvent != INVALID_HANDLE_VALUE ) )
-    {
-        CloseHandle( m_hNextSkeletonEvent );
-        m_hNextSkeletonEvent = NULL;
-    }
-    if( m_hNextDepthFrameEvent && ( m_hNextDepthFrameEvent != INVALID_HANDLE_VALUE ) )
-    {
-        CloseHandle( m_hNextDepthFrameEvent );
-        m_hNextDepthFrameEvent = NULL;
-    }
-    if( m_hNextVideoFrameEvent && ( m_hNextVideoFrameEvent != INVALID_HANDLE_VALUE ) )
-    {
-        CloseHandle( m_hNextVideoFrameEvent );
-        m_hNextVideoFrameEvent = NULL;
-    }
-    m_DrawDepth.DestroyDevice( );
-    m_DrawVideo.DestroyDevice( );
-}
-
-
-
 DWORD WINAPI CSkeletalViewerApp::Nui_ProcessThread(LPVOID pParam)
 {
     CSkeletalViewerApp *pthis=(CSkeletalViewerApp *) pParam;
@@ -346,11 +153,15 @@ RGBQUAD p2Unmatched		= {0x47, 0x63, 0xff, 0x00};
 RGBQUAD p2Out			= {0xb4, 0x69, 0xff, 0x00};
 RGBQUAD p2InWrongBox    = {0xeb, 0xce, 0xff, 0x00};
 
+RGBQUAD pOut			= {0xf0, 0x20, 0x80, 0x00};
+
 RGBQUAD ignored			= {0xfa, 0xfa, 0xff, 0x00};
 //InWrongBox colours are for p2 is in p1's boxes, and vice versa.
 
 RGBQUAD progressBox		= {0xff, 0xff, 0xff, 0x00};
 RGBQUAD remainingBox	= {0x00, 0xff, 0xff, 0x00};
+
+RGBQUAD white = {0xff, 0xff, 0xff, 0x00}; 
 
 const int HOLD_FRAMES_FOR_MATCH = 30;
 int p1MatchProgress = 0;
@@ -539,39 +350,34 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				//the desired shape with 0, 1 and 2. etc. 
 				if (m_selectedShape == NULL || 
 					m_selectedShape[i] == 0) {
-					if (p1Score >= limit) {
-						p1Passed = false;
-						drawBox(i, &p1Out, 0.5);
-					} else if (p2Score >= limit) {
-						p2Passed = false;
-						drawBox(i, &p2Out, 0.5);
-					} else {
-						drawBox(i, &ignored, 0.25);
+					if (p1Score >= limit || p2Score >= limit) {
+						if (((i%4)%2) == 0 ) { //calculates if i is on the right side of the screen.
+							p1Passed = false;
+						} else { //((i%4)%2) == 1
+							p2Passed = false;
+						}
+						drawBox(i, &pOut, 0.5);
+					} else { //nobody present.
+						drawBox(i, &ignored, 0.1);
 					}
 				} else if (m_selectedShape[i] == 1) {
-					if (p1Score < limit) {
-						p1Passed = false;
-						if (p2Score> limit) {
-							drawBox(i, &p2InWrongBox, 0.5);						
-						} else {
-							drawBox(i, &p1Unmatched, 0.5);
-						}
-					} else {
-						drawBox(i, &p1Matched, 0.4);
+					if (p1Score > limit || p2Score > limit)
+					{
+						drawBox(i, &p1Unmatched, 0.7);
 						p1scoreCount++;
+					} else {
+						p1Passed = false;
+						drawBox(i, &p1Unmatched, 0.3);
 					}
 				} else if (m_selectedShape[i] == 2) {
-					if (p2Score < limit) {
-						p2Passed = false;
-						if (p1Score> limit) {
-							drawBox(i, &p1InWrongBox, 0.5);						
-						} else {
-							drawBox(i, &p2Unmatched, 0.5);
-						}
-					} else {
-						drawBox(i, &p2Matched, 0.4);
+					if (p1Score > limit || p2Score > limit)
+					{
+						drawBox(i, &p2Unmatched, 0.7);
 						p2scoreCount++;
-					}
+					} else {
+						p2Passed = false;
+						drawBox(i, &p2Unmatched, 0.3);
+					} 
 				}
 			}
 
@@ -620,6 +426,21 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					ShapeCompleted(pWinNum);
 
+					if (pWinNum == 1)
+					{
+						p1Points++;
+						lastPointWinner = 1;
+					}
+					if (pWinNum == 2)
+					{
+						p2Points++;
+						lastPointWinner = 2;
+					}
+					if (p1Points > pMaxPoints || p2Points > pMaxPoints)
+					{
+						p1Points = 0; p2Points = 0;
+					}
+
 					TwitterPost(ShapeIndex, ori, Shapes::X1(ShapeIndex,ori,pWinNum)*m_boxWidth +x_box_offset, 
 						Shapes::Y1(ShapeIndex,ori,pWinNum)*m_boxHeight+y_box_offset, 
 						Shapes::X2(ShapeIndex,ori,pWinNum)*m_boxWidth+x_box_offset,
@@ -630,10 +451,40 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 
 					//HACK m_timeLimit = 0; //This line would end gameplay if you wanted.
 
+					winningShapeDisplay = 60;
+					for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
+						winningShapeStatus[i] = pWinNum == m_selectedShape[i]?pWinNum:0;
+					}
+
+
 					// new shape
 					newRandomShape();
 				}
 			}
+
+			//show winning shape for a bit
+			if (winningShapeDisplay > 0)
+			{
+				for (UINT i = 0; i < m_numHBox * m_numVBox; i++) {
+					if (winningShapeStatus[i] != 0)
+					{
+						drawBox(i, &white, &white, 0.0);
+					}
+				}
+				winningShapeDisplay--;
+			}
+
+			//show points
+			for (int i = 0; i < p1Points; i++)
+			{
+				drawRect(320 - 30 - 25*i, 320 - 10 - 25*i,y_box_offset-70,y_box_offset-50,&p1Unmatched,0.9);
+			}
+
+			for (int i = 0; i < p2Points; i++)
+			{
+				drawRect(320 + 10 + 25*i,320 + 30 + 25*i,y_box_offset-70,y_box_offset-50,&p2Unmatched,0.9);
+			}
+
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
 			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
@@ -643,7 +494,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			if (m_timeLimit != 0)
 			{
 				Timeout();
-				m_timeLimit = 0;
+				newRandomShape();
 			}
 			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}

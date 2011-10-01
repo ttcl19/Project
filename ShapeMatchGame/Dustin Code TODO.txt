@@ -1,17 +1,6 @@
 (mostly for Dustin to keep track of his work - careful editing)
 
 
-- Kate & Derek's colour suggestions:
-Having the 4 colors is a little confusing. What if it were just 2 - green for the shape and red for out of bounds. For the green it could be more opaque and/or brighter if the square is "filled" and a less opaque for the square that needs to be filled.
-An alternate or additional approach would be to grey or black out the squares where there is no block or body so that all you see is the shapes and body parts that are out of bounds
-- allow for collaborative block completion & increase holding time (1 second, etcetera).
-
-- visual feedback on which player won
- - visual feedback that winning happened (flashing of the shape?)
-
-
-
-
 
 - Derek Canonical rotation?
 
@@ -36,6 +25,8 @@ An alternate or additional approach would be to grey or black out the squares wh
 - Improve image quality - will use desklamps
 
 - (optional) fix memory access violation error when running from executable
+
+- (optional) visual feedback on which player won
 
 
 

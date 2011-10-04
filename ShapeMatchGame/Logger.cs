@@ -15,6 +15,14 @@ namespace BodyTetrisWrapper
         public Logger(string path)
         {
             logStartTime = DateTime.Now;
+
+            string dir = path.Substring(0, path.LastIndexOf("/"));
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
             logFilename = path;
             logStream = new StreamWriter(logFilename, true);
 

@@ -144,7 +144,7 @@ void CSkeletalViewerApp::Nui_GotVideoAlert( )
 
 //Assigns the colours and effects of each respective case 
 RGBQUAD p1Matched		= {0x32, 0xcd, 0x32, 0x00};
-RGBQUAD p1Unmatched		= {0xeb, 0xce, 0x87, 0x00};
+RGBQUAD p1Unmatched		= {0xef, 0xce, 0x87, 0x00};
 RGBQUAD p1Out			= {0xf0, 0x20, 0x80, 0x00};
 RGBQUAD p1InWrongBox    = {0x47, 0xff, 0xff, 0x00};
 
@@ -357,7 +357,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						} else { //((i%4)%2) == 1
 							p2Passed = false;
 						}
-						drawBox(i, &pOut, 0.5);
+						drawBox(i, &pOut, 0.3);
 					} else { //nobody present.
 						drawBox(i, &ignored, 0.1);
 					}
@@ -368,7 +368,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						p1scoreCount++;
 					} else {
 						p1Passed = false;
-						drawBox(i, &p1Unmatched, 0.3);
+						drawBox(i, &p1Unmatched, 0.4);
 					}
 				} else if (m_selectedShape[i] == 2) {
 					if (p1Score > inLimit || p2Score > inLimit)
@@ -377,7 +377,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 						p2scoreCount++;
 					} else {
 						p2Passed = false;
-						drawBox(i, &p2Unmatched, 0.3);
+						drawBox(i, &p2Unmatched, 0.4);
 					} 
 				}
 			}

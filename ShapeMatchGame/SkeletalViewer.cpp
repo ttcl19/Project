@@ -304,7 +304,7 @@ void openKinectWindow()
 	ShowWindow(g_hWndApp,SW_SHOW);
 	UpdateWindow(g_hWndApp);
 
-	int WindowX = -1024;
+	int WindowX = 0;
 	int WindowY = 0;
 
 	MoveWindow(g_hWndApp,WindowX,WindowY,1024,768,true);

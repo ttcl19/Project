@@ -9,11 +9,11 @@ int CSkeletalViewerApp::TwitterPost(int shape, int orientation, int X1, int Y1, 
 	int w = X2 - X1;
 	int h = Y2 - Y1;
 	
-	printf("TwitterPost shape: %i X1: %i Y1: %i X2: %i Y2: %i\n", shape, X1, Y1, X2, Y2);
+	//printf("TwitterPost shape: %i X1: %i Y1: %i X2: %i Y2: %i\n", shape, X1, Y1, X2, Y2);
 
 	if (!PICTURE_TAKING)
 	{
-		printf("Picture taking repressed.\n");
+		//printf("Picture taking repressed.\n");
 		return 1;
 	}
 

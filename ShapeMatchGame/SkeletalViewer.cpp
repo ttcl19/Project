@@ -189,7 +189,7 @@ void CSkeletalViewerApp::KeyboardInput(WPARAM keyCode)
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
-	printf("m_timeLimit %i",m_timeLimit);
+	//printf("m_timeLimit %i",m_timeLimit);
 
 }
 

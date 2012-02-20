@@ -1,0 +1,20 @@
+PROGRAMMING
+1) Rounds
+- read round length from settings file
+- “end round” - no shapes until keyboard input.
+  - r - start round
+  - e - end round
+- round id displayed somehow....
+- remaining round length shown
+- score shown....make things thinner
+
+
+3) Full screen picture on round end in separate folder (timeout or win)
+
+4) Record Full Skeletal location
+    
+
+FINISHED
+
+
+2) No shape repetitions

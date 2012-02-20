@@ -18,7 +18,8 @@ namespace BodyTetrisWrapper
         static UdpWriter OSCSender; 
 
         //HACK TWEETING_ENABLED
-        const bool TWEETING_ENABLED = false;
+        const bool TWEETING_ENABLED = true;
+        //also relies on PICTURE_TAKING in .cpp project. Yeaaaaaaaaaahhhhhh - Dustin
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void VoidFunc();
@@ -434,7 +435,7 @@ namespace BodyTetrisWrapper
         }
         public static void RoundStart(int goalShape, int orientation, IntPtr goalShapeStatus) 
         {
-            Console.WriteLine("Sending Round Start");
+            //Console.WriteLine("Sending Round Start");
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/roundstart"));
             //send bundle

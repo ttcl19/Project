@@ -74,13 +74,19 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 
 int CSkeletalViewerApp::newRandomShape()
 {
-	int shape = rand() % 8;
+	int shape = ShapeIndex;
+	//guarantees shape type is new.
+	while (shape == ShapeIndex)
+	{
+		shape = rand() % 8;
+	}
 	newShape(shape);
 	return shape;
 }
 
 void CSkeletalViewerApp::newShape(int newShapeIndex)
 {
+	//gets random orientation and sets up occpancy array.
 	ori = 0;
 
 	switch(newShapeIndex)
@@ -125,7 +131,7 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 	}
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
-	printf("m_timeLimit %i\n",m_timeLimit);
+	//printf("m_timeLimit %i\n",m_timeLimit);
 	
 	if (m_selectedShape != 0)
 	{
@@ -304,7 +310,7 @@ void openKinectWindow()
 	ShowWindow(g_hWndApp,SW_SHOW);
 	UpdateWindow(g_hWndApp);
 
-	int WindowX = -1024;
+	int WindowX = 0;
 	int WindowY = 0;
 
 	MoveWindow(g_hWndApp,WindowX,WindowY,1024,768,true);

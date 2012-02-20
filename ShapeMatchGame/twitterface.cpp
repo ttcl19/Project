@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-bool PICTURE_TAKING = false;
+bool PICTURE_TAKING = true;
 
 int CSkeletalViewerApp::TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2) {
 	int w = X2 - X1;

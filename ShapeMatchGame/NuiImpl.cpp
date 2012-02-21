@@ -385,30 +385,34 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			ShapeStatus(p1scoreCount,p2scoreCount); //OSC
 			PlayerStatus(lastp1z, lastp2z, players);
 
-			if (p1Passed) {
-				if (p1MatchProgress == 0)
-					Holding(1); //first time holding
-				p1MatchProgress++;
-			} else {
-				if (p1MatchProgress > 0)
-					HoldFail(1); //first time failing
-				p1MatchProgress = 0;
-			}
+			if (ShapeIndex >= 0) //player match progress.
+			{
 
-			drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/HOLD_FRAMES_FOR_MATCH,
-				y_box_offset-20,y_box_offset,&progressBox,1.0);
+				if (p1Passed) {
+					if (p1MatchProgress == 0)
+						Holding(1); //first time holding
+					p1MatchProgress++;
+				} else {
+					if (p1MatchProgress > 0)
+						HoldFail(1); //first time failing
+					p1MatchProgress = 0;
+				}
+				drawRect(x_box_offset,x_box_offset + m_boxWidth*3*p1MatchProgress/HOLD_FRAMES_FOR_MATCH,
+					y_box_offset-20,y_box_offset,&progressBox,1.0);
 
-			if (p2Passed) {
-				if (p2MatchProgress == 0)
-					Holding(2); //first time holding
-				p2MatchProgress++;
-			} else {
-				if (p2MatchProgress > 0)
-					HoldFail(2); //first time failing
-				p2MatchProgress = 0;
+				if (p2Passed) {
+					if (p2MatchProgress == 0)
+						Holding(2); //first time holding
+					p2MatchProgress++;
+				} else {
+					if (p2MatchProgress > 0)
+						HoldFail(2); //first time failing
+					p2MatchProgress = 0;
+				}
+				drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/HOLD_FRAMES_FOR_MATCH,
+					y_box_offset-20,y_box_offset,&progressBox,1.0);
+
 			}
-			drawRect(x_box_offset+ m_boxWidth*3,x_box_offset + m_boxWidth*3 + m_boxWidth*3*p2MatchProgress/HOLD_FRAMES_FOR_MATCH,
-				y_box_offset-20,y_box_offset,&progressBox,1.0);
 
 			bool p1Win = p1MatchProgress >= HOLD_FRAMES_FOR_MATCH;
 			bool p2Win = p2MatchProgress >= HOLD_FRAMES_FOR_MATCH;
@@ -458,7 +462,7 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 					p1MatchProgress = 0; p2MatchProgress = 0;
 
 					// new shape
-					newRandomShape();
+					newRandomShape(); //printf("win reset\n");
 				}
 			}
 
@@ -485,14 +489,15 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 				drawRect(320 + 10 + 25*i,320 + 30 + 25*i,y_box_offset-70,y_box_offset-60,&p2Unmatched,0.9);
 			}
 
-			//time remaining progress bar
-			int remaining = (int)( m_timeLimit - GetTickCount64());
-			//printf("%i %i\n", (int)(320 - 320*remaining/(float)m_timeAvailable), (int)(320 + 320*remaining/(float)m_timeAvailable));
-			if (remaining > 0)
+			if (ShapeIndex >= 0) //time remaining progress bar
 			{
-				drawRect((int)(320 - 320*remaining/(float)m_timeAvailable),(int)(320 + 320*remaining/(float)m_timeAvailable) ,y_box_offset- 50, y_box_offset- 40,&remainingBox,1.0);
+				int remaining = (int)( m_timeLimit - GetTickCount64());
+				//printf("%i %i\n", (int)(320 - 320*remaining/(float)m_timeAvailable), (int)(320 + 320*remaining/(float)m_timeAvailable));
+				if (remaining > 0)
+				{
+					drawRect((int)(320 - 320*remaining/(float)m_timeAvailable),(int)(320 + 320*remaining/(float)m_timeAvailable) ,y_box_offset- 50, y_box_offset- 40,&remainingBox,1.0);
+				}
 			}
-
 			m_DrawVideo.DrawFullRect( (BYTE*) m_videoEffects );
 
 			m_DrawVideo.FinishedDrawThisFrame(); //expect no more video calls.
@@ -502,16 +507,21 @@ void CSkeletalViewerApp::Nui_GotDepthAlert( ) //This is the event where most of 
 			if (m_timeLimit != 0)
 			{
 				Timeout();
-				newRandomShape();
+
+				int gameTimeRemaining = GetTickCount64() - GameEndTime;
+				//printf("Game Time Remaining: %i\n", gameTimeRemaining);
+				if (gameTimeRemaining > 0 && ShapeIndex != -1)
+				{
+					//game is over.
+					printf("game is over\n");
+
+					newShape(-1);
+				} else {
+					newRandomShape(); //printf("out of time reset\n");
+				}
 			}
 			m_DrawVideo.DrawFrame( (BYTE*) m_videoCache);
 		}
-
-		
-
-
-
-
 
         m_DrawDepth.DrawFrame( (BYTE*) m_rgbWk );
 
@@ -559,7 +569,6 @@ void CSkeletalViewerApp::Nui_GotSkeletonAlert( )
     m_LastSkeletonFoundTime = -1;
 
     // draw each skeleton color according to the slot within they are found.
-    //
     bool bBlank = true;
     for( int i = 0 ; i < NUI_SKELETON_COUNT ; i++ )
     {
@@ -569,9 +578,25 @@ void CSkeletalViewerApp::Nui_GotSkeletonAlert( )
 
             bBlank = false;
         }
+
+		int index = i*(NUI_SKELETON_POSITION_COUNT + 1 );
+		SkeletalPositionData[index*3] = SkeletonFrame.SkeletonData[i].Position.x;
+		SkeletalPositionData[index*3 + 1] = SkeletonFrame.SkeletonData[i].Position.y;
+		SkeletalPositionData[index*3 + 2] = SkeletonFrame.SkeletonData[i].Position.z;
+
+		for (int sp = 0; sp < NUI_SKELETON_POSITION_COUNT; sp++)
+		{
+			int index = i*(NUI_SKELETON_POSITION_COUNT + 1) + sp + 1;
+			SkeletalPositionData[index*3] = SkeletonFrame.SkeletonData[i].SkeletonPositions[sp].x;
+			SkeletalPositionData[index*3 + 1] = SkeletonFrame.SkeletonData[i].SkeletonPositions[sp].y;
+			SkeletalPositionData[index*3 + 2] = SkeletonFrame.SkeletonData[i].SkeletonPositions[sp].z;
+		}
+			 
     }
 
-    Nui_DoDoubleBuffer(GetDlgItem(m_hWnd,IDC_SKELETALVIEW), m_SkeletonDC);
+	skeletalLog(SkeletalPositionData);
+
+    //Nui_DoDoubleBuffer(GetDlgItem(m_hWnd,IDC_SKELETALVIEW), m_SkeletonDC);
 }
 
 RGBQUAD CSkeletalViewerApp::Nui_ShortToQuad_Depth( USHORT s )

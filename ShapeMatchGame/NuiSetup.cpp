@@ -37,6 +37,7 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	y_box_offset = 80;
 
 	winningShapeStatus = new int[4*6];
+	SkeletalPositionData = new float[NUI_SKELETON_COUNT*(NUI_SKELETON_POSITION_COUNT+1)*3];
 
 	lastp1z = -1; lastp2z = -1;
 
@@ -49,7 +50,6 @@ HRESULT CSkeletalViewerApp::Nui_Init()
 	m_selectedShape = NULL;
 
 	m_timeLimit = 1;
-	m_timeLimit = 10;
 	m_timeAvailable = 10 * 1000; //HACK make 10 seconds later.
 	lastCountdownMessageSent = -1;
 

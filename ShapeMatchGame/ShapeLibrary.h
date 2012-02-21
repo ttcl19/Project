@@ -5,6 +5,8 @@
 
 namespace Shapes {
 
+	extern int empty[][24];
+
 	extern int I[][24];
 
 	extern int J[][24];

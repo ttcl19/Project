@@ -10,7 +10,6 @@ namespace BodyTetrisWrapper
 {
     class Twitpic
     {
-
         string Username = "BodyTetris";
         string Password = "squiggle";
 

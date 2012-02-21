@@ -29,6 +29,13 @@ namespace BodyTetrisWrapper
             AddLogWithTime("LogStart");
         }
 
+        static public string GetDateTimeString()
+        {
+            DateTime Now = DateTime.Now;
+            string dateTimeString = Now.Month + "-" + Now.Day + "-" + Now.Hour + ":" + Now.Minute + ":" + Now.Second + "." + Now.Millisecond;
+            return dateTimeString;
+        }
+
         public void AddLog(string log)
         {
             logStream.WriteLine(log);
@@ -38,13 +45,22 @@ namespace BodyTetrisWrapper
         {
             DateTime Now = DateTime.Now;
             string dateTimeString = Now.Month + "-" + Now.Day + "-" + Now.Hour + ":" + Now.Minute + ":" + Now.Second + "." + Now.Millisecond;
-
             double msDiff = (Now - logStartTime).TotalMilliseconds;
 
-            AddLog(dateTimeString + " " + msDiff + " " + log);
+            AddLog(dateTimeString + " " + msDiff + " " + log + " Game:" + Program.GameID);
         }
 
         public void AddLogWithTime(string log, int[] array)
+        {
+            log += " ";
+            for (int i = 0; i < array.Length; i++)
+            {
+                log += array[i] + ",";
+            }
+            AddLogWithTime(log);
+        }
+
+        public void AddLogWithTime(string log, float[] array)
         {
             log += " ";
             for (int i = 0; i < array.Length; i++)

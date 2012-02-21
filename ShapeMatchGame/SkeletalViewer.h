@@ -50,6 +50,9 @@ public:
 	void					KeyboardInput(WPARAM keyCode);
 	void					CapturePicture();
 	int						(*TweetPicture)(int shape, int orientation,int w, int h, int squareSize, void* ptr);
+	int						(*saveFullPicture)(void* ptr);
+	int						(*skeletalLog)(void* ptr);
+	
     void*					(*globalAlloc)(int size);
 
 	//OSC Stuff
@@ -72,6 +75,7 @@ public:
 
 	void					newShape(int ShapeIndex);
 	int						newRandomShape();
+	void					setGameEndTime(int GameLength);
 
 	int						winningShapeDisplay;
 	int	*					winningShapeStatus;
@@ -80,6 +84,10 @@ public:
 	int						p2Points;
 	int						pMaxPoints;
 	int						lastPointWinner;
+
+	int						GameEndTime; //in Tick64 whatever.
+
+	float*					SkeletalPositionData;
 
 private:
     static DWORD WINAPI     Nui_ProcessThread(LPVOID pParam);

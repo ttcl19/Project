@@ -1,20 +1,38 @@
 PROGRAMMING
-1) Rounds
-- read round length from settings file
-- “end round” - no shapes until keyboard input.
-  - r - start round
-  - e - end round
-- round id displayed somehow....
-- remaining round length shown
-- score shown....make things thinner
 
-
-3) Full screen picture on round end in separate folder (timeout or win)
 
 4) Record Full Skeletal location
-    
+Associated P1 & P2 with skeleton.....
+
+Send whole array of skeletal x,y,z to C#
+
+write array in log.
+curP1Index
+
+
+
+OPTIONAL
+
+- score shown....make things thinner 
 
 FINISHED
 
+1) Rounds
+
+- write gameID in pictures...
+
+
+
+
+1) 
+
+SET AS NULL ROUND:
+
+- stop round counters
+- stop hold counters.
+
+
 
 2) No shape repetitions
+
+3) Full screen picture on round end in separate folder (timeout or win)

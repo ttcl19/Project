@@ -6,6 +6,25 @@
 bool PICTURE_TAKING = true;
 
 int CSkeletalViewerApp::TwitterPost(int shape, int orientation, int X1, int Y1, int X2, int Y2) {
+	
+	unsigned char * fullimageBits =  (unsigned char*)globalAlloc(640*480*3);
+	//fill fullimageBits
+	for (int x = 0; x < 640; x++)
+	{
+		for (int y = 0; y< 480; y++)
+		{
+			
+			int bitsIndex = (x + y*640)*3;
+			int imageIndex = x + y*640;
+			fullimageBits[bitsIndex  ] = m_videoCache[imageIndex].rgbRed;
+			fullimageBits[bitsIndex + 1 ] = m_videoCache[imageIndex].rgbGreen;
+			fullimageBits[bitsIndex + 2 ] = m_videoCache[imageIndex].rgbBlue;
+		}
+	}
+
+	saveFullPicture((void*)fullimageBits);
+	
+	//sub picture
 	int w = X2 - X1;
 	int h = Y2 - Y1;
 	

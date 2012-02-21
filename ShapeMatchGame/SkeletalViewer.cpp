@@ -32,7 +32,14 @@ HWND				g_hWndApp;				// Windows Handle to main application
 TCHAR				g_szAppTitle[256];		// Application title
 
 extern "C" _declspec(dllexport) void openKinectWindow();
-extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr));
+extern "C" _declspec(dllexport) void startGame(int GameID, int GameLength);
+extern "C" _declspec(dllexport) void endGame();
+extern "C" _declspec(dllexport) int setTweetback(void* (*globalAlloc)(int size), 
+	int (*TweetPicture)(int shape, int orientation, int w, int h, int squareSize, void* ptr),
+	int (*saveFullPicture)(void* ptr),
+	int (*skeletalLog)(void* ptr)
+	
+	);
 
 extern "C" _declspec(dllexport) int setOSCEvents(
 	void (*RoundStart)(int goalShape, int orientation, int* goalShapeStatus), 
@@ -60,7 +67,7 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 		switch(cmd)
 		{
 			case -1: //random shape
-				newRandomShape();
+				newRandomShape(); printf("cmd\n");
 				break;
 
 			case 0: //force tweet
@@ -72,8 +79,16 @@ int CSkeletalViewerApp::numericCommand(int cmd)
 	return 0;
 }
 
+void CSkeletalViewerApp::setGameEndTime(int GameLength) //s
+{
+	GameEndTime = GetTickCount64() + GameLength*1000;
+	//printf("sss %i\n",GameEndTime);
+
+}
+
 int CSkeletalViewerApp::newRandomShape()
 {
+	//printf("Random\n");
 	int shape = ShapeIndex;
 	//guarantees shape type is new.
 	while (shape == ShapeIndex)
@@ -81,9 +96,13 @@ int CSkeletalViewerApp::newRandomShape()
 		shape = rand() % 8;
 	}
 	newShape(shape);
+
+	int gameTimeRemaining = GetTickCount64() - GameEndTime;
+	printf("Game Time Remaining: %i\n",-gameTimeRemaining/1000);
+
 	return shape;
 }
-
+	
 void CSkeletalViewerApp::newShape(int newShapeIndex)
 {
 	//gets random orientation and sets up occpancy array.
@@ -91,6 +110,10 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 
 	switch(newShapeIndex)
 	{
+		case -1:
+			m_selectedShape = Shapes::empty[0];
+			ShapeIndex = -1;
+			break;
 		case 1:
 			ori = rand() % Shapes::ori[0];
 			m_selectedShape = Shapes::I[ori];
@@ -129,6 +152,8 @@ void CSkeletalViewerApp::newShape(int newShapeIndex)
 			ShapeIndex = 7; 
 			break;
 	}
+
+	
 
 	m_timeLimit = GetTickCount64() + m_timeAvailable;
 	//printf("m_timeLimit %i\n",m_timeLimit);
@@ -228,7 +253,10 @@ return (nRet);
 			g_CSkeletalViewerApp.m_hFontFPS=CreateFontIndirect(&lf);
 			SendDlgItemMessage(hWnd,IDC_FPS,WM_SETFONT,(WPARAM) g_CSkeletalViewerApp.m_hFontFPS,0);
 
-			g_CSkeletalViewerApp.newRandomShape(); //Start the game!
+			g_CSkeletalViewerApp.m_selectedShape = Shapes::empty[0];
+
+			startGame(0,1000000);
+			//g_CSkeletalViewerApp.newRandomShape(); //Start the game!
 			}
 			break;
 
@@ -251,10 +279,16 @@ return (nRet);
 	return (FALSE);
 }
 
-int setTweetback(void* (*globalAlloc)(int size), int (*TweetPicture)(int shape, int orientation,int w, int h, int squareSize, void* ptr))
+int setTweetback(void* (*globalAlloc)(int size), 
+	int (*TweetPicture)(int shape, int orientation,int w, int h, int squareSize, void* ptr),
+	int (*saveFullPicture)(void* ptr),
+	int (*skeletalLog)(void* ptr))
 {
 	g_CSkeletalViewerApp.globalAlloc = globalAlloc;
 	g_CSkeletalViewerApp.TweetPicture = TweetPicture;
+	g_CSkeletalViewerApp.saveFullPicture = saveFullPicture;
+	g_CSkeletalViewerApp.skeletalLog = skeletalLog;
+	
 	return 0;
 }
 
@@ -328,6 +362,18 @@ void openKinectWindow()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
     }
+}
+
+void startGame(int GameID, int GameLength)
+{
+	//receives GameLength in s, up-converts to ms.
+	g_CSkeletalViewerApp.setGameEndTime(GameLength);
+	g_CSkeletalViewerApp.newRandomShape(); //Start the game!
+}
+
+void endGame()
+{
+	g_CSkeletalViewerApp.newShape(-1);
 }
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow)

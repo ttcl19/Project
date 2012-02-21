@@ -15,8 +15,12 @@ namespace BodyTetrisWrapper
     class Program
     {
         static int OSC_PORT = 7710; //overridden by OSC_PORT.txt
-        static UdpWriter OSCSender; 
+        static UdpWriter OSCSender;
 
+        static int GameLength = 2*60; //seconds.
+
+        public static int GameID = -1;        
+        
         //HACK TWEETING_ENABLED
         const bool TWEETING_ENABLED = true;
         //also relies on PICTURE_TAKING in .cpp project. Yeaaaaaaaaaahhhhhh - Dustin
@@ -42,7 +46,6 @@ namespace BodyTetrisWrapper
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void PlayerStatusFunc(float i, float j, IntPtr ptr);
 
-
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void IntNPtrPassFunc(int i, int j, IntPtr ptr);
 
@@ -56,10 +59,16 @@ namespace BodyTetrisWrapper
         public static extern void openKinectWindow();
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void startGame(int GameID, int gameLengthS);
+
+        [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void endGame();
+
+        [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int numericCommand(int cmd);
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int setTweetback(AllocFunc allocGlobal, TweetFunc tweetBack);
+        public static extern int setTweetback(AllocFunc allocGlobal, TweetFunc tweetBack, PtrPassFunc saveFullPicture, PtrPassFunc SkeletonLog);
 
         [DllImport("SkeletalViewer.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int setOSCEvents(IntNPtrPassFunc RoundStart, IntFunc Countdown, IntFunc Holding, IntFunc HoldFail,
@@ -90,6 +99,18 @@ namespace BodyTetrisWrapper
             SaveJPG(pixels, w, h, "block_images/" + Filename);
             FileStream stream = new FileStream("block_images_names/" + Filename, FileMode.Create);
             stream.Close();
+        }
+
+        public static int SkeletonLog(IntPtr ptr)
+        {
+            int count = 6 * 23 * 3;
+            float[] points = new float[count];
+            Marshal.Copy(ptr, points, 0, count);
+            logger.AddLogWithTime("BodyData", points);
+
+            //TODO
+
+            return 0;
         }
 
         static string imgExt = ".jpg";
@@ -123,6 +144,18 @@ namespace BodyTetrisWrapper
             return 0;
         }
 
+        public static int SaveWholePicture(IntPtr ptr)
+        {
+            int w = 640; int h = 480;
+            byte[] pixels = new byte[w * h * 3];
+            Marshal.Copy(ptr, pixels, 0, w * h * 3);
+            string Filename = /*Logger.GetDateTimeString() +*/ " " + GameID + " " + numPhotos + ".jpg";
+            SaveJPG(pixels, w, h, "whole_images/" + Filename);
+
+            //TODO save full picture
+            return 0;
+        }
+
         public static int TweetPicture(int shape, int ori, int w, int h, int squareSize, IntPtr ptr)
         {
             try
@@ -136,7 +169,7 @@ namespace BodyTetrisWrapper
                 int orientation = Tetronimos.OrientationConversion(shape, ori);
 
                 string TweetString = Tetronimos.GetString(shape, orientation);
-                string TweetFileName = "" + TweetString + " " + numPhotos + imgExt;
+                string TweetFileName = "" + TweetString + " " + GameID + " " + numPhotos + imgExt;
 
                 makeFullImage(pixels, w, h, TweetFileName); //mainstream pictures
 
@@ -386,7 +419,9 @@ namespace BodyTetrisWrapper
 
             AllocFunc allocGlobalFunc = new AllocFunc(Program.allocGlobal);
             TweetFunc TweetPictureDel = new TweetFunc(Program.TweetPicture); DontThrowOutMaDelegates.Add(TweetPictureDel);
-            int ret = setTweetback(allocGlobalFunc, TweetPictureDel);
+            PtrPassFunc FullPictureDel = new PtrPassFunc(Program.SaveWholePicture); DontThrowOutMaDelegates.Add(FullPictureDel);
+            PtrPassFunc SkeletonLogDel = new PtrPassFunc(Program.SkeletonLog); DontThrowOutMaDelegates.Add(SkeletonLogDel);
+            int ret = setTweetback(allocGlobalFunc, TweetPictureDel, FullPictureDel,SkeletonLogDel);
             IntNPtrPassFunc RoundStartDel = new IntNPtrPassFunc(Program.RoundStart); DontThrowOutMaDelegates.Add(RoundStartDel);
             IntFunc CountdownDel = new IntFunc(Program.Countdown); DontThrowOutMaDelegates.Add(CountdownDel);
             IntFunc HoldingDel = new IntFunc(Program.Holding); DontThrowOutMaDelegates.Add(HoldingDel);
@@ -413,10 +448,22 @@ namespace BodyTetrisWrapper
                 {
                     int number = Convert.ToInt32(input);
                     numericCommand(number);
+                    
                 }
                 catch
                 {
                     //string commands.
+                    switch (input)
+                    {
+                        case "s":
+                            GameID++;
+                            startGame(GameID,GameLength);
+                            Console.WriteLine("Starting Game " + GameID);
+                            break;
+                        case "e":
+                            endGame();
+                            break;
+                    }
                 }
                 input = "";
 
@@ -426,7 +473,7 @@ namespace BodyTetrisWrapper
         }
 
 #region OSC Events
-        public static void GameStart()
+        public static void GameStart() //not used.
         {
             OscBundle bundle = new OscBundle();
             bundle.AddElement(new OscElement("/gamestart"));
